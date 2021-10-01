@@ -29,3 +29,7 @@ dependencies {
     implementation("com.slack.api:bolt-jetty:1.1.+")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
 }
+
+tasks.register("stage"){
+    dependsOn("build", "clean")
+}
