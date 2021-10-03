@@ -10,7 +10,7 @@ import com.lonelybot.slack.SlackApp
 fun main() {
 
 
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+    embeddedServer(Netty, System.getenv("PORT").toInt(), host = "0.0.0.0") {
         configureRouting()
         configureSerialization()
     }.start(wait = false)
