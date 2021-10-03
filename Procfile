@@ -1,0 +1,1 @@
+web: ./build/install/slack-lonely-bot/bin/slack-lonely-bot

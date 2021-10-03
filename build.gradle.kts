@@ -31,5 +31,5 @@ dependencies {
 }
 
 tasks.register("stage"){
-    dependsOn("build", "clean")
+    dependsOn("installDist")
 }
