@@ -1,4 +1,9 @@
 package com.lonelybot
+
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+
 /*
 * Endpoints
 * */
@@ -15,8 +20,8 @@ const val HEADER_NOTION_VERSION_VALUE = "2021-08-16"
 /*
 * Tokens
 * */
-val BOT_TOKEN = System.getenv("SLACK_BOT_TOKEN")
-val NOTION_TOKEN = System.getenv("NOTION_TOKEN")
+val BOT_TOKEN: String = System.getenv("SLACK_BOT_TOKEN")
+val NOTION_TOKEN: String = System.getenv("NOTION_TOKEN")
 
 /*
 * Lists
@@ -28,4 +33,21 @@ val ACCEPTED_CARD_RED_VALUES = listOf("red", "roja", "rojo")
 * Notion Endpoints Values
 * */
 
-val MEME_TABLE_ID = "8cfaddc8b0b94550aa203acf26ec8740"
+const val MEME_TABLE_ID = "8cfaddc8b0b94550aa203acf26ec8740"
+
+/*
+* Zone Offset
+* */
+
+val PARIS_ZONE_OFFSET: ZoneOffset = ZoneId.of("Europe/Berlin").rules.getOffset(LocalDateTime.now())
+
+/*
+* Regex /tarjeta
+* */
+
+val REGEX_PHRASE_WITH_REASON = "^(${ACCEPTED_CARD_YELLOW_VALUES.joinToString("|")}|${ACCEPTED_CARD_RED_VALUES.joinToString("|")}) a <@(\\w+\\|[\\w\\W]+)> por [\\w\\W]+".toRegex()
+val REGEX_PHRASE_NO_REASON = "^(${ACCEPTED_CARD_YELLOW_VALUES.joinToString("|")}|${ACCEPTED_CARD_RED_VALUES.joinToString("|")}) a <@(\\w+\\|[\\w\\W]+)>".toRegex()
+
+val REGEX_GET_COLOUR = "${ACCEPTED_CARD_YELLOW_VALUES.joinToString("|")}|${ACCEPTED_CARD_RED_VALUES.joinToString("|")}".toRegex()
+val REGEX_GET_USER = "<@(\\w+\\|[\\w\\W]+)>".toRegex()
+val REGEX_GET_REASON = "(?<=por )[\\w\\W]+".toRegex()

@@ -1,5 +1,7 @@
 package com.lonelybot.slack
 
+import com.lonelybot.NotionTags
+
 data class Params(val token: String, val team_id: String, val team_domain: String, val channel_id: String,
                   val channel_name: String, val user_id: String, val user_name: String, val command: String, val text: String,
                   val api_app_id: String, val is_enterprise_install: String, val response_url: String, val trigger_id: String)
@@ -12,3 +14,5 @@ data class ContextBlock(val elements: MutableList<Element>): Block(type = BlockT
 interface Element
 data class Text(val type: String, val text: String) : Element
 data class Image(val type: String, val image_url: String, val alt_text: String): Element
+
+data class Card(val fromUser: String, val color: NotionTags, val toUser: String, val onChannel: String, val reason: String? = null)

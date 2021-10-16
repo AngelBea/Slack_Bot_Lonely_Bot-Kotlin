@@ -2,12 +2,8 @@ package com.lonelybot.slack
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.lonelybot.ACCEPTED_CARD_RED_VALUES
-import com.lonelybot.ACCEPTED_CARD_YELLOW_VALUES
-import com.lonelybot.MEME_TABLE_ID
-import com.lonelybot.NotionTags
+import com.lonelybot.*
 import com.lonelybot.not.*
-
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -16,36 +12,37 @@ import io.ktor.routing.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.sql.Time
-import java.util.*
+import org.eclipse.jetty.http.HttpStatus
+import java.time.*
 import kotlin.random.Random
-import kotlin.reflect.KClass
 
 fun Route.commandLecture() {
     post("/command") {
         val parameters = processParameters(call.receiveParameters())
         println("Parameters: $parameters")
-        withContext(Dispatchers.Unconfined) {
+        withContext(Dispatchers.Default) {
             val command = SlackCommands.values().filter { it.shortcut == parameters.command }.firstOrNull()
 
             when (command) {
                 SlackCommands.CARD -> {
-                    val splittedMessage = parameters.text.split(" ")
-                    val color = splittedMessage.last()
-                    when (color.lowercase()) {
-                        in ACCEPTED_CARD_YELLOW_VALUES -> processCardService(parameters, NotionTags.YELLOW_COLOUR)
-                        in ACCEPTED_CARD_RED_VALUES -> processCardService(parameters, NotionTags.RED_COLOUR)
-                        else -> SlackApp.request.post.sendTextMessage(
-                            parameters.channel_id,
-                            "¿Estas seguro que sabes los colores?"
-                        )
+                    val text = parameters.text
+
+                    if (text.matches(REGEX_PHRASE_WITH_REASON)){
+                        processCardService(checkCardCommand(parameters, true))
+                    }else if (text.matches(REGEX_PHRASE_NO_REASON)){
+                        processCardService(checkCardCommand(parameters))
+
+                    }else{
+                        call.respond("Recuerda el comando es /tarjeta [color] a @user por [motivo] | ¡El motivo es opcional!")
                     }
                 }
+                SlackCommands.TIME -> {
+                    processGetTimeRemaining(parameters)
+                }
                 else -> {
-                    SlackApp.request.post.sendTextMessage(parameters.channel_id, "¡Ese comando no existe!")
+                    SlackApp.request.post.sendTextMessage(parameters.channel_id, "Ese comando no esta disponible para tu Team o esta en desarrollo")
                 }
             }
-
         }
 
         call.respond(HttpStatusCode.OK)
@@ -62,13 +59,29 @@ private fun processParameters(parameters: Parameters): Params {
     return Gson().fromJson(paramsJson, Params::class.java)
 }
 
-private suspend fun processCardService(parameters: Params, tag: NotionTags) {
+
+private fun checkCardCommand(parameters: Params, withReason: Boolean = false): Card{
+    val text = parameters.text
+
+    val color = REGEX_GET_COLOUR.find(text)?.value ?: ""
+    val notionColorTag = if (color in ACCEPTED_CARD_RED_VALUES) NotionTags.RED_COLOUR
+                            else if(color in ACCEPTED_CARD_YELLOW_VALUES) NotionTags.YELLOW_COLOUR
+                            else NotionTags.NONE
+
+    val user = REGEX_GET_USER.find(text)?.value ?: ""
+    val reason = REGEX_GET_REASON.find(text)?.value ?: ""
+
+    return if (withReason) Card(parameters.user_name, notionColorTag, user, parameters.channel_id, reason)
+                else Card(parameters.user_name, notionColorTag, user, parameters.channel_id)
+}
+
+private suspend fun processCardService(card: Card) {
     val blocks = mutableListOf<Block>()
-    val username = parameters.text.split(" ").first()
+    val username = card.toUser
 
     val notionFilter = NotionFilterBuilder.build<String> {
         this.contains("Tags", NotionTypes.MULTI_SELECT, "Tarjeta")
-        this.contains("Tags", NotionTypes.MULTI_SELECT, tag.tagName)
+        this.contains("Tags", NotionTypes.MULTI_SELECT, card.color.tagName)
     }
 
     val response = NotionApp.request.post.queryDatabase(
@@ -85,7 +98,7 @@ private suspend fun processCardService(parameters: Params, tag: NotionTags) {
         ContextBlock(
             mutableListOf(
                 Text(
-                    ElementType.MARKDOWN.typeName, "<@${parameters.user_id}> ha sacado ${tag.emote} a $username"
+                    ElementType.MARKDOWN.typeName, "<@${card.fromUser}> ha sacado ${card.color.emote} a $username por ${card.reason ?: "los loles"}"
                 )
             )
         )
@@ -94,9 +107,53 @@ private suspend fun processCardService(parameters: Params, tag: NotionTags) {
         ImageBlock(
             cardMemes.first().url.richText.first().href,
             cardMemes.first().name.title.first().value,
-            Text(ElementType.TEXT.typeName, "${tag.tagName} de <@${parameters.user_name}>")
+            Text(ElementType.TEXT.typeName, "${card.color.tagName} de <@${card.fromUser}>")
         )
     )
 
-    SlackApp.request.post.sendBlockedMessage(parameters.channel_id, blocks)
+    SlackApp.request.post.sendBlockedMessage(card.onChannel, blocks)
+}
+
+private suspend fun processGetTimeRemaining(parameters: Params){
+    val localTime = LocalDateTime.now().atZone(PARIS_ZONE_OFFSET)
+
+    when(localTime.dayOfWeek){
+        DayOfWeek.SATURDAY -> SlackApp.request.post.sendTextMessage(parameters.channel_id, "Que pasa <@${parameters.user_name}> ¿Quieres trabajar en Sabado?")
+        DayOfWeek.SUNDAY -> SlackApp.request.post.sendTextMessage(parameters.channel_id, "Que pasa <@${parameters.user_name}> ¿Quieres trabajar en Domingo?")
+        else -> SlackApp.request.post.sendTextMessage(parameters.channel_id, "<@${parameters.user_name}> quedan: ${calculateHours(localTime)}")
+    }
+}
+
+private fun calculateHours(now: ZonedDateTime): String {
+    val fridayAtThree = when (now.dayOfWeek) {
+        DayOfWeek.MONDAY -> with(now.plusDays(4)) {
+            LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
+        }
+        DayOfWeek.TUESDAY -> with(now.plusDays(3)) {
+            LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
+        }
+        DayOfWeek.WEDNESDAY -> with(now.plusDays(2)) {
+            LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
+        }
+        DayOfWeek.THURSDAY -> with(now.plusDays(1)) {
+            LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
+        }
+        DayOfWeek.FRIDAY -> with(now.plusDays(0)) {
+            LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
+        }
+        DayOfWeek.SATURDAY -> with(now.plusDays(6)) {
+            LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
+        }
+        DayOfWeek.SUNDAY -> with(now.plusDays(5)) {
+            LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
+        }
+    }
+
+    fridayAtThree.let(::println)
+
+    val secondsBetween = (fridayAtThree.toEpochSecond() - now.toEpochSecond())
+    val hours = secondsBetween / 3600 to secondsBetween % 3600
+    val minutes = hours.second / 60 to hours.second % 60
+
+    return "${hours.first - ((24 - 8) * 4)} horas, ${minutes.first} minutos y ${minutes.second} segundos de agonia"
 }
