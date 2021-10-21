@@ -160,7 +160,7 @@ private fun calculateHours(now: ZonedDateTime): String {
 
     fridayAtThree.let(::println)
 
-    val secondsBetween = (fridayAtThree.toEpochSecond() - now.toEpochSecond()) - (64 * 3600)
+    val secondsBetween = (fridayAtThree.toEpochSecond() - now.toEpochSecond())
     val hours = secondsBetween / 3600 to secondsBetween % 3600
     val minutes = hours.second / 60 to hours.second % 60
 
