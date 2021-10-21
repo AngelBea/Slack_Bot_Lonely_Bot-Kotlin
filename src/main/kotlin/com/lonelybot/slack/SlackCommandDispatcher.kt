@@ -125,26 +125,35 @@ private suspend fun processGetTimeRemaining(parameters: Params){
 }
 
 private fun calculateHours(now: ZonedDateTime): String {
+    var hourGap = 0
+    
     val fridayAtThree = when (now.dayOfWeek) {
         DayOfWeek.MONDAY -> with(now.plusDays(4)) {
+            hourGap = 4
             LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
         }
         DayOfWeek.TUESDAY -> with(now.plusDays(3)) {
+            hourGap = 3
             LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
         }
         DayOfWeek.WEDNESDAY -> with(now.plusDays(2)) {
+            hourGap = 2
             LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
         }
         DayOfWeek.THURSDAY -> with(now.plusDays(1)) {
+            hourGap = 1
             LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
         }
         DayOfWeek.FRIDAY -> with(now.plusDays(0)) {
+            hourGap = 0
             LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
         }
         DayOfWeek.SATURDAY -> with(now.plusDays(6)) {
+            hourGap = 6
             LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
         }
         DayOfWeek.SUNDAY -> with(now.plusDays(5)) {
+            hourGap = 5
             LocalDateTime.of(this.year, this.month, this.dayOfMonth, 15, 0, 0).atZone(PARIS_ZONE_OFFSET)
         }
     }
@@ -155,5 +164,5 @@ private fun calculateHours(now: ZonedDateTime): String {
     val hours = secondsBetween / 3600 to secondsBetween % 3600
     val minutes = hours.second / 60 to hours.second % 60
 
-    return "${hours.first} horas, ${minutes.first} minutos y ${minutes.second} segundos de agonia"
+    return "return "${hours.first - ((24 - 8) * hourGap)} horas, ${minutes.first} minutos y ${minutes.second} segundos de agonia""
 }
