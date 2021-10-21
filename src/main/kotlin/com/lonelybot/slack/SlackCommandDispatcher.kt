@@ -151,9 +151,9 @@ private fun calculateHours(now: ZonedDateTime): String {
 
     fridayAtThree.let(::println)
 
-    val secondsBetween = (fridayAtThree.toEpochSecond() - now.toEpochSecond())
+    val secondsBetween = (fridayAtThree.toEpochSecond() - now.toEpochSecond()) - (64 * 3600)
     val hours = secondsBetween / 3600 to secondsBetween % 3600
     val minutes = hours.second / 60 to hours.second % 60
 
-    return "${hours.first - 32} horas, ${minutes.first} minutos y ${minutes.second} segundos de agonia"
+    return "${hours.first} horas, ${minutes.first} minutos y ${minutes.second} segundos de agonia"
 }
