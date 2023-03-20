@@ -5,7 +5,7 @@ import com.lonelybot.*
 import com.slack.api.bolt.App
 import com.slack.api.bolt.jetty.SlackAppServer
 import io.ktor.client.*
-import io.ktor.client.features.observer.*
+import io.ktor.client.plugins.observer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -17,7 +17,6 @@ object SlackApp{
         App()
     }
 
-
     private lateinit var response: HttpResponse
 
     init {
@@ -28,7 +27,7 @@ object SlackApp{
         private val client: HttpClient = HttpClient {
             install(ResponseObserver) {
                 onResponse {
-                    println(it.content.readUTF8Line())
+                    it.bodyAsChannel().readUTF8Line().let(::println)
                     response = it
                 }
             }
@@ -47,11 +46,11 @@ object SlackApp{
 
                     val message = Message(channel, text)
 
-                    body = Gson().toJson(message)
+                    setBody(Gson().toJson(message))
                 }
             }
 
-            suspend fun sendBlockedMessage(channel: String, blocks: MutableList<Block>){
+            suspend fun sendBlockedMessage(channel: String, blocks: MutableList<Block>): HttpResponse {
                 return client.request{
                     headers {
                         append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
@@ -63,7 +62,7 @@ object SlackApp{
 
                     val message = Message(channel, "", blocks = blocks)
 
-                    body = Gson().toJson(message)
+                    setBody(Gson().toJson(message))
                 }
             }
         }

@@ -8,6 +8,7 @@ enum class NotionLogicalFilter(val jsonValue: String) {
 enum class NotionTypes{
     TITLE,
     RICHT_TEXT,
+    TEXT,
     URL,
     EMAIL,
     PHONE,
