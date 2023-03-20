@@ -55,7 +55,7 @@ class NotionFilterBuilder<T> {
         TODO()
     }
 
-    fun lessThanOrQualTo(property: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder<T>{
+    fun lessThanOrEqualTo(property: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder<T>{
         TODO()
     }
 

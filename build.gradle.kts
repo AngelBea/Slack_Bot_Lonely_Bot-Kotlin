@@ -4,7 +4,8 @@ val logback_version: String by project
 
 plugins {
     application
-    kotlin("jvm") version "1.5.31"
+    id("io.ktor.plugin") version "2.2.4"
+    kotlin("jvm") version "1.6.0"
 }
 
 group = "com.lonelybot"
@@ -24,12 +25,20 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
-    implementation("com.slack.api:bolt:1.1.+")
-    implementation("com.slack.api:bolt-servlet:1.1.+")
-    implementation("com.slack.api:bolt-jetty:1.1.+")
+    implementation("com.slack.api:bolt:1.28.0")
+    implementation("com.slack.api:bolt-servlet:1.28.0")
+    implementation("com.slack.api:bolt-jetty:1.28.0")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-gson:$ktor_version")
 }
 
 tasks.register("stage"){
-    dependsOn("installDist")
+    dependsOn("clean", "build")
+}
+tasks.jar{
+    manifest.attributes["Main_Class"] = "com/lonelybot/Application.kt"
+    val dependencies = configurations.runtimeClasspath.get().map(::zipTree)
+    from(dependencies)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

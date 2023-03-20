@@ -4,15 +4,15 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.lonelybot.*
 import com.lonelybot.not.*
-import io.ktor.application.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.eclipse.jetty.http.HttpStatus
 import java.time.*
 import kotlin.random.Random
 
@@ -21,8 +21,8 @@ fun Route.commandLecture() {
         val parameters = processParameters(call.receiveParameters())
         println("Parameters: $parameters")
         withContext(Dispatchers.Default) {
-            val command = SlackCommands.values().filter { it.shortcut == parameters.command }.firstOrNull()
-
+            val command = SlackCommands.values().firstOrNull { it.shortcut == parameters.command }
+            command.let(::println)
             when (command) {
                 SlackCommands.CARD -> {
                     val text = parameters.text
@@ -38,6 +38,9 @@ fun Route.commandLecture() {
                 }
                 SlackCommands.TIME -> {
                     processGetTimeRemaining(parameters)
+                }
+                SlackCommands.SUGGEST -> {
+
                 }
                 else -> {
                     SlackApp.request.post.sendTextMessage(parameters.channel_id, "Ese comando no esta disponible para tu Team o esta en desarrollo")
@@ -88,10 +91,10 @@ private suspend fun processCardService(card: Card) {
         notionFilter,
         NotionLogicalFilter.AND,
         MEME_TABLE_ID
-    ).content.readUTF8Line()
+    ).bodyAsChannel().readUTF8Line()
 
-    val cardMemes = NotionObjectParser(Gson().fromJson(response, JsonObject::class.java), Memes::class)
-        .parseQueryObject<Memes>()
+    val cardMemes = NotionObjectParser(Gson().fromJson(response, JsonObject::class.java), Meme::class)
+        .parseQueryObject<Meme>()
         .shuffled(Random(System.currentTimeMillis()))
 
     blocks.add(
@@ -105,8 +108,8 @@ private suspend fun processCardService(card: Card) {
     )
     blocks.add(
         ImageBlock(
-            cardMemes.first().url.richText.first().href,
-            cardMemes.first().name.title.first().value,
+            cardMemes.first().url.richText.first().href ?: "",
+            cardMemes.first().name.title.first().value ?: "",
             Text(ElementType.TEXT.typeName, "${card.color.tagName} de <@${card.fromUser}>")
         )
     )
@@ -165,4 +168,8 @@ private fun calculateHours(now: ZonedDateTime): String {
     val minutes = hours.second / 60 to hours.second % 60
 
     return "${hours.first - ((24 - 8) * hourGap)} horas, ${minutes.first} minutos y ${minutes.second} segundos de agonia"
+}
+
+fun processCommandSuggest(){
+
 }
