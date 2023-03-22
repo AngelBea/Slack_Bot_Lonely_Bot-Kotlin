@@ -13,15 +13,7 @@ import io.ktor.utils.io.*
 
 
 object SlackApp{
-    val app: App by lazy {
-        App()
-    }
-
     private lateinit var response: HttpResponse
-
-    init {
-        SlackAppServer(this.app).start()
-    }
 
     object request{
         private val client: HttpClient = HttpClient {

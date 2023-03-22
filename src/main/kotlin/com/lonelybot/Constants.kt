@@ -52,7 +52,7 @@ val REGEX_PHRASE_WITH_REASON = "^(${ACCEPTED_CARD_YELLOW_VALUES.joinToString("|"
 val REGEX_PHRASE_NO_REASON = "^(${ACCEPTED_CARD_YELLOW_VALUES.joinToString("|")}|${ACCEPTED_CARD_RED_VALUES.joinToString("|")}) a <@(\\w+\\|[\\w\\W]+)>".toRegex()
 
 val REGEX_GET_COLOUR = "${ACCEPTED_CARD_YELLOW_VALUES.joinToString("|")}|${ACCEPTED_CARD_RED_VALUES.joinToString("|")}".toRegex()
-val REGEX_GET_USER = "<@(\\w+\\|[\\w\\W]+)>".toRegex()
+val REGEX_GET_USER = "(?<=<@)\\w+".toRegex()
 val REGEX_GET_REASON = "(?<=por )[\\w\\W]+".toRegex()
 
 /*

@@ -12,6 +12,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.*
 import kotlin.random.Random
@@ -20,24 +22,25 @@ fun Route.commandLecture() {
     post("/command") {
         val parameters = processParameters(call.receiveParameters())
         println("Parameters: $parameters")
-        withContext(Dispatchers.Default) {
-            val command = SlackCommands.values().firstOrNull { it.shortcut == parameters.command }
-            command.let(::println)
+    
+        val command = SlackCommands.values().firstOrNull { it.shortcut == parameters.command }
+        command.let(::println)
+        launch {
             when (command) {
                 SlackCommands.CARD -> {
+               
                     val text = parameters.text
 
                     if (text.matches(REGEX_PHRASE_WITH_REASON)){
                         processCardService(checkCardCommand(parameters, true))
                     }else if (text.matches(REGEX_PHRASE_NO_REASON)){
                         processCardService(checkCardCommand(parameters))
-
                     }else{
-                        call.respond("Recuerda el comando es /tarjeta [color] a @user por [motivo] | ¡El motivo es opcional!")
+                        SlackApp.request.post.sendTextMessage(parameters.channel_id,"Recuerda el comando es /tarjeta [color] a @user por [motivo] | ¡El motivo es opcional!")
                     }
-                }
+                }                
                 SlackCommands.TIME -> {
-                    processGetTimeRemaining(parameters)
+                    processGetTimeRemaining(parameters) 
                 }
                 SlackCommands.SUGGEST -> {
 
@@ -47,21 +50,10 @@ fun Route.commandLecture() {
                 }
             }
         }
-
+        
         call.respond(HttpStatusCode.OK)
     }
 }
-
-private fun processParameters(parameters: Parameters): Params {
-    val mapParams = mutableMapOf<String, String>()
-
-    parameters.entries().forEach { mapParams[it.key] = it.value.first() }
-
-    val paramsJson = Gson().toJson(mapParams)
-
-    return Gson().fromJson(paramsJson, Params::class.java)
-}
-
 
 private fun checkCardCommand(parameters: Params, withReason: Boolean = false): Card{
     val text = parameters.text
@@ -74,11 +66,12 @@ private fun checkCardCommand(parameters: Params, withReason: Boolean = false): C
     val user = REGEX_GET_USER.find(text)?.value ?: ""
     val reason = REGEX_GET_REASON.find(text)?.value ?: ""
 
-    return if (withReason) Card(parameters.user_name, notionColorTag, user, parameters.channel_id, reason)
+    return if (withReason) Card(parameters.user_id, notionColorTag, user, parameters.channel_id, reason)
                 else Card(parameters.user_name, notionColorTag, user, parameters.channel_id)
 }
 
-private suspend fun processCardService(card: Card) {
+suspend fun processCardService(card: Card) {
+    card.let(::println)
     val blocks = mutableListOf<Block>()
     val username = card.toUser
 
@@ -101,7 +94,7 @@ private suspend fun processCardService(card: Card) {
         ContextBlock(
             mutableListOf(
                 Text(
-                    ElementType.MARKDOWN.typeName, "<@${card.fromUser}> ha sacado ${card.color.emote} a $username por ${card.reason ?: "los loles"}"
+                    ElementType.MARKDOWN.typeName, "<@${card.fromUser}> ha sacado ${card.color.emote} a <@${username}> por ${card.reason ?: "los loles"}"
                 )
             )
         )
