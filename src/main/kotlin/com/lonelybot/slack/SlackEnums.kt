@@ -12,9 +12,8 @@ enum class BlockType(val typeName: String){
 }
 
 enum class SlackCommands(val shortcut: String){
-    CARD("/tarjeta"),
-    TIME("/cuantoparahuir"),
-    SUGGEST("/sugerirTarjeta")
+    CARD("/lonelycard"),
+    TIME("/lonelyrun")    
 }
 
 enum class ElementType(val typeName: String){

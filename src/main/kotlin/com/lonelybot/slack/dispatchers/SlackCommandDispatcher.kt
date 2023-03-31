@@ -46,9 +46,6 @@ fun Route.commandReader() {
                 SlackCommands.TIME -> {
                     processGetTimeRemaining(parameters) 
                 }
-                SlackCommands.SUGGEST -> {
-
-                }
                 else -> {
                     SlackApp.request.post.sendTextMessage(
                         parameters.channel_id,
