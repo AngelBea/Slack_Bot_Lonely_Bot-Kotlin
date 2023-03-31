@@ -5,3 +5,8 @@ enum class NotionTags(val tagName: String, val emote: String){
     YELLOW_COLOUR("Amarilla", ":large_yellow_square:"),
     NONE("","")
 }
+
+enum class Permissions{
+    TIMEREMAINING,
+    CARDS
+}

@@ -1,65 +1,74 @@
 package com.lonelybot.not
 
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-
-class NotionFilterBuilder<T> {
+class NotionFilterBuilder {
     val filters: MutableList<MutableMap<String, Any>> = mutableListOf()
 
     companion object{
-        inline fun <T: Any> build (builder: NotionFilterBuilder<T>.() -> Unit): NotionFilterBuilder<T>{
-            return NotionFilterBuilder<T>().apply(builder)
+        inline fun build (builder: NotionFilterBuilder.() -> Unit): NotionFilterBuilder{
+            return NotionFilterBuilder().apply(builder)
         }
     }
 
 
-    fun contains(property: String, type: NotionTypes, typeConditon: T): NotionFilterBuilder<T>{
+    fun contains(field: String, type: NotionTypes, typeConditon: Any): NotionFilterBuilder{
         filters.add(
             mutableMapOf(
-                NotionFields.PROPERTY.name.lowercase() to property,
+                NotionFields.PROPERTY.name.lowercase() to field,
                 type.name.lowercase() to mapOf("contains" to typeConditon)
             )
         )
         return this
     }
 
-    fun equals(property: String, type: NotionTypes, typeConditon: T): NotionFilterBuilder<T>{
+    fun equals(field: String, type: NotionTypes, typeConditon: Any): NotionFilterBuilder{
+        filters.add(
+            mutableMapOf(
+                NotionFields.PROPERTY.name.lowercase() to field,
+                type.name.lowercase() to mapOf("equals" to typeConditon)
+            )
+        )
+        return this
+    }
+
+    fun doesNotEqual(field: String, type: NotionTypes, typeConditon: Any): NotionFilterBuilder{
+        filters.add(
+            mutableMapOf(
+                NotionFields.PROPERTY.name.lowercase() to field,
+                type.name.lowercase() to mapOf("does_not_equal" to typeConditon)
+            )
+        )
+        return this
+    }
+
+    fun startsWith(field: String, type: NotionTypes, typeConditon: String): NotionFilterBuilder{
         TODO()
     }
 
-    fun doesNotEqual(property: String, type: NotionTypes, typeConditon: T): NotionFilterBuilder<T>{
+    fun endsWith(field: String, type: NotionTypes, typeConditon: String): NotionFilterBuilder{
         TODO()
     }
 
-    fun startsWith(property: String, type: NotionTypes, typeConditon: String): NotionFilterBuilder<T>{
+    fun isEmpty(field: String, type: NotionTypes, typeConditon: Boolean): NotionFilterBuilder{
         TODO()
     }
 
-    fun endsWith(property: String, type: NotionTypes, typeConditon: String): NotionFilterBuilder<T>{
+    fun isNotEmpty(field: String, type: NotionTypes, typeConditon: Boolean): NotionFilterBuilder{
         TODO()
     }
 
-    fun isEmpty(property: String, type: NotionTypes, typeConditon: Boolean): NotionFilterBuilder<T>{
+    fun greaterThan(field: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder{
         TODO()
     }
 
-    fun isNotEmpty(property: String, type: NotionTypes, typeConditon: Boolean): NotionFilterBuilder<T>{
+    fun lessThan(field: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder{
         TODO()
     }
 
-    fun greaterThan(property: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder<T>{
+    fun lessThanOrEqualTo(field: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder{
         TODO()
     }
 
-    fun lessThan(property: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder<T>{
-        TODO()
-    }
-
-    fun lessThanOrEqualTo(property: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder<T>{
-        TODO()
-    }
-
-    fun greaterThanOrEqualTo(property: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder<T>{
+    fun greaterThanOrEqualTo(field: String, type: NotionTypes, typeConditon: Number): NotionFilterBuilder{
         TODO()
     }
 }

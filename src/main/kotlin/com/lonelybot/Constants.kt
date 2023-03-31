@@ -1,13 +1,18 @@
 package com.lonelybot
 
+import com.lonelybot.not.SlackUser
+import java.sql.Time
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 
 /*
 * Endpoints
 * */
 const val POST_MESSAGE_URL = "https://slack.com/api/chat.postMessage"
+const val HIDDEN_MESSAGE_URL = "https://slack.com/api/chat.postEphemeral"
+const val PUBLISH_HOME_URL = "https://slack.com/api/views.publish"
+const val USER_CONVERSATION_URL = "https://slack.com/api/users.conversations"
+const val OPEN_CONVERSATION_URL = "https://slack.com/api/conversations.open"
 
 /*
 * Headers
@@ -15,7 +20,7 @@ const val POST_MESSAGE_URL = "https://slack.com/api/chat.postMessage"
 const val HEADER_AUTH_NAME = "Authorization"
 const val HEADER_CONTENT_TYPE_NAME = "Content-Type"
 const val HEADER_NOTION_VERSION_NAME = "Notion-Version"
-const val HEADER_NOTION_VERSION_VALUE = "2021-08-16"
+const val HEADER_NOTION_VERSION_VALUE = "2022-06-28"
 
 /*
 * Tokens
@@ -42,7 +47,7 @@ const val MEME_TABLE_ID = "8cfaddc8b0b94550aa203acf26ec8740"
 * Zone Offset
 * */
 
-val PARIS_ZONE_OFFSET: ZoneOffset = ZoneId.of("Europe/Berlin").rules.getOffset(LocalDateTime.now())
+val ZONE_OFFSET: ZoneOffset = ZoneOffset.UTC.rules.getOffset(LocalDateTime.now())
 
 /*
 * Regex /tarjeta
@@ -60,3 +65,31 @@ val REGEX_GET_REASON = "(?<=por )[\\w\\W]+".toRegex()
 * */
 
 const val SOURCE_TEST_VALUE = "Test"
+
+/*
+* Messages
+ */
+
+const val YOU_WERE_NOT_REGISTERED = "No estabas registrado en el sistema, pero Mr. Lonely lo ha hecho automaticamente :face_with_monocle:. Prueba a usar /lonelyme"
+const val COMMAND_OR_ACTION_BLOCKED = "¡Uh, oh, sin permisos! :x:. Parece que alguien ha enfadado a Mr. Lonely :anger::face_with_monocle:"
+const val REMAINING_TIME_MSG = "En mi mansión (La Home App) puedes decirme cuando sales, entonces te diré cuanto te queda."
+const val YOU_SHOULD_NOT_BE_HERE = "¿Tu no te habías ido ya o quieres seguir trabajando?"
+
+/*
+* View Texts
+ */
+
+val VIEW_HOME_MESSAGE_MR_LONELY = {user: SlackUser -> """Hola <@${user.slackId.richText.first().plainText}> me gusta tener a mis esbirros controlados. Dime aquí lo que haces mientras yo no te veo."""}
+val VIEW_HOME_IMAGE_MR_LONELY = "https://i.imgur.com/adR1WUq.png"
+val VIEW_HOME_ALT_MR_LONELY = "Mr. Lonely"
+
+val VIEW_HOME_DATEPICKER_FRIDAY = "¿A que hora te piensas ir los Viernes?"
+val VIEW_HOME_DATEPICKER_WEEK = "¿A que hora empiezas a hacer el vago entre semana?"
+val VIEW_HOME_ACTIONID_FRIDAY = "time-remaining-pick-friday"
+val VIEW_HOME_ACTIONID_WEEK = "time-remaining-pick-week"
+val VIEW_HOME_TIME_FRIDAY = Time.valueOf("15:00:00")
+val VIEW_HOME_TIME_WEEK = Time.valueOf("17:30:00")
+val VIEW_HOME_PLACEHOLDER_TIMEPICKER = "Pon la hora."
+val VIEW_HOME_SECTION_FRIDAY_ID = "time-remaining-section-friday"
+val VIEW_HOME_SECTION_WEEK_ID = "time-remaining-section-week"
+val VIEW_HOME_SAVE_BUTTON_ID = "save-time-remaining"

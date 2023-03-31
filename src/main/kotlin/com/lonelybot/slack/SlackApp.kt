@@ -2,8 +2,8 @@ package com.lonelybot.slack
 
 import com.google.gson.Gson
 import com.lonelybot.*
-import com.slack.api.bolt.App
-import com.slack.api.bolt.jetty.SlackAppServer
+import com.lonelybot.slack.builders.SlackBlockBuilder
+import com.lonelybot.slack.builders.SlackViewBuilder
 import io.ktor.client.*
 import io.ktor.client.plugins.observer.*
 import io.ktor.client.request.*
@@ -41,8 +41,24 @@ object SlackApp{
                     setBody(Gson().toJson(message))
                 }
             }
+            
+            suspend fun sendHiddenMessage(channel: String, text: String, toUser: String): HttpResponse{
+                return client.request{
+                    headers {
+                        append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
+                        append(HEADER_CONTENT_TYPE_NAME, "application/json")
+                    }
 
-            suspend fun sendBlockedMessage(channel: String, blocks: MutableList<Block>): HttpResponse {
+                    url(HIDDEN_MESSAGE_URL)
+                    method = HttpMethod.Post
+
+                    val message = Message(channel, text, user = toUser)
+
+                    setBody(Gson().toJson(message))
+                }
+            }
+
+            suspend fun sendBlockedMessage(channel: String, builder: SlackBlockBuilder): HttpResponse {
                 return client.request{
                     headers {
                         append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
@@ -52,11 +68,59 @@ object SlackApp{
                     url(POST_MESSAGE_URL)
                     method = HttpMethod.Post
 
-                    val message = Message(channel, "", blocks = blocks)
+                    val message = Message(channel, "", blocks = builder.blocks)
 
                     setBody(Gson().toJson(message))
                 }
             }
+            
+            suspend fun publishView(viewBuilder: SlackViewBuilder): HttpResponse {
+                return client.request{                    
+                    headers {
+                        append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
+                        append(HEADER_CONTENT_TYPE_NAME, "application/json")
+                    }
+
+                    url(PUBLISH_HOME_URL)
+                    method = HttpMethod.Post
+
+                    setBody(viewBuilder.toJson())
+                }
+            }
+
+            suspend fun openUserConversation(userId: String? = null, returnIm: Boolean?): HttpResponse{
+                return client.request{
+                    headers {
+                        append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
+                        append(HEADER_CONTENT_TYPE_NAME, "application/json")
+                    }
+
+                    url(OPEN_CONVERSATION_URL)
+                    method = HttpMethod.Post
+                    val map = mapOf("return_im" to returnIm, "users" to userId)
+                    Gson().toJson(map).let(::println)
+                    setBody(Gson().toJson(map))
+                }
+            }
+        }
+        
+        object get{
+            suspend fun getUserConversations(userId: String? = null, teamId: String? = null, vararg conversationTypes: String): HttpResponse{
+                return client.request{
+                    headers {
+                        append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
+                        append(HEADER_CONTENT_TYPE_NAME, "application/json")
+                    }
+
+                    url(USER_CONVERSATION_URL)
+                    method = HttpMethod.Get
+                    val map = mapOf("user" to userId, "team_id" to teamId, "types" to conversationTypes.joinToString(","))
+                    Gson().toJson(map).let(::println)
+                    setBody(Gson().toJson(map))
+                }
+            }
+
+           
         }
     }
 

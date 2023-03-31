@@ -25,12 +25,10 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
-    implementation("com.slack.api:bolt:1.28.0")
-    implementation("com.slack.api:bolt-servlet:1.28.0")
-    implementation("com.slack.api:bolt-jetty:1.28.0")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-gson:$ktor_version")
+    implementation("com.jayway.jsonpath:json-path:2.8.0")
 }
 
 tasks.register("stage"){

@@ -24,7 +24,8 @@ enum class NotionTypes{
     LAST_EDITED_BY,
     FILES,
     RELATION,
-    FORMULA
+    FORMULA,
+    EQUATION
 }
 
 enum class NotionFields{
@@ -32,3 +33,24 @@ enum class NotionFields{
     FILTER
 }
 
+enum class NotionAnnotationColors(val value: String) {
+    BLUE("blue"),
+    BLUE_BACKGROUND("blue_background"),
+    BROWN("brown"),
+    BROWN_BACKGROUND("brown_background"),
+    DEFAULT("default"),
+    GRAY("gray"),
+    GRAY_BACKGROUND("gray_background"),
+    GREEN("green"),
+    GREEN_BACKGROUND("green_background"),
+    ORANGE("orange"),
+    ORANGE_BACKGROUND("orange_background"),
+    PINK("pink"),
+    PINK_BACKGROUND("pink_background"),
+    PURPLE("purple"),
+    PURPLE_BACKGROUND("purple_background"),
+    RED("red"),
+    RED_BACKGROUND("red_background"),
+    YELLOW("yellow"),
+    YELLOW_BACKGROUND("yellow_background")
+}

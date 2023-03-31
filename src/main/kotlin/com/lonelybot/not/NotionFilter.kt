@@ -6,7 +6,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.lonelybot.kObjectToJsonObject
 
-class NotionFilter<T>(val logicalFilter: NotionLogicalFilter?, val notionFilterBuilder:  NotionFilterBuilder<T>) {
+class NotionFilter(val logicalFilter: NotionLogicalFilter?, val notionFilterBuilder:  NotionFilterBuilder) {
     val filterObject: JsonObject
 
     init{
@@ -17,7 +17,7 @@ class NotionFilter<T>(val logicalFilter: NotionLogicalFilter?, val notionFilterB
         }
     }
 
-    private fun constructJsonObject(logicalFilter: NotionLogicalFilter, notionFilterBuilder: NotionFilterBuilder<T>): JsonObject{
+    private fun constructJsonObject(logicalFilter: NotionLogicalFilter, notionFilterBuilder: NotionFilterBuilder): JsonObject{
         val rootObj = JsonObject()
         val filterObj = JsonObject()
         val orArray = JsonArray()

@@ -1,10 +1,8 @@
 package com.lonelybot.not
 
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.lonelybot.*
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.plugins.observer.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -14,6 +12,7 @@ import io.ktor.utils.io.*
 object NotionApp {
     private val ENDPOINT_QUERY = {tableId: String -> "https://api.notion.com/v1/databases/$tableId/query"}
     private val ENDPOINT_PAGE_CREATION = "https://api.notion.com/v1/pages"
+    private val ENDPOINT_PAGE_UPDATE = { pageId: String -> "https://api.notion.com/v1/pages/$pageId" }
 
     private lateinit var response: HttpResponse
     object request{
@@ -27,7 +26,7 @@ object NotionApp {
         }
 
         object post {
-            suspend fun <T: Any> queryDatabase(notionFilterBuilder: NotionFilterBuilder<T>, notionLogicalFilter: NotionLogicalFilter?, databaseId: String): HttpResponse{
+            suspend fun queryDatabase(notionFilterBuilder: NotionFilterBuilder, notionLogicalFilter: NotionLogicalFilter?, databaseId: String): HttpResponse{
                 val filter = NotionFilter(notionLogicalFilter, notionFilterBuilder)
                 return client.request {
                     headers {
@@ -42,7 +41,7 @@ object NotionApp {
                 }
             }
 
-            suspend fun insertPage(page: NotionPage): HttpResponse{
+            suspend fun insertPage(page: NotionPageBuilder): HttpResponse{
                 return client.request{
                     headers{
                         append(HEADER_AUTH_NAME, "Bearer $NOTION_TOKEN")
@@ -52,7 +51,25 @@ object NotionApp {
 
                     method = HttpMethod.Post
                     url(ENDPOINT_PAGE_CREATION)
-                    setBody(page.toJson()) 
+                    val body = page.toJson()
+                    body.let(::println)
+                    setBody(body) 
+                }
+            }
+
+            suspend fun updatePage(id: String, builder: NotionPageBuilder): HttpResponse{
+                return client.request{
+                    headers{
+                        append(HEADER_AUTH_NAME, "Bearer $NOTION_TOKEN")
+                        append(HEADER_CONTENT_TYPE_NAME, "application/json")
+                        append(HEADER_NOTION_VERSION_NAME, HEADER_NOTION_VERSION_VALUE)
+                    }
+
+                    method = HttpMethod.Patch
+                    url(id.let(ENDPOINT_PAGE_UPDATE))
+                    val body = mapOf("properties" to builder.properties)
+                    body.let(::println)
+                    setBody(Gson().toJson(body))
                 }
             }
         }
