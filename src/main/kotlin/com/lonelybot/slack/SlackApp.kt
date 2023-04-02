@@ -7,6 +7,7 @@ import com.lonelybot.slack.builders.SlackViewBuilder
 import io.ktor.client.*
 import io.ktor.client.plugins.observer.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.*
@@ -117,6 +118,22 @@ object SlackApp{
                     val map = mapOf("user" to userId, "team_id" to teamId, "types" to conversationTypes.joinToString(","))
                     Gson().toJson(map).let(::println)
                     setBody(Gson().toJson(map))
+                }
+            }
+            suspend fun getUserInfo(userId: String): HttpResponse{
+                return client.request{
+                    headers {
+                        append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
+                        append(HEADER_CONTENT_TYPE_NAME, "application/x-www-form-urlencoded")
+                    }
+                    
+                    url(USER_INFO_URL)
+                    method = HttpMethod.Post
+                    setBody(FormDataContent(
+                        Parameters.build { 
+                            append("user", userId)
+                        }
+                    ))
                 }
             }
 

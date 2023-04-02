@@ -51,6 +51,17 @@ data class Team(val id: String, val domain: String)
 
 data class User(val id: String, val username: String, @SerializedName("team_id") val teamId: String, val name: String)
 
+data class SlackUserInfo(val id: String, @SerializedName("team_id") val teamId: String, val name: String, val deleted: Boolean,
+                         val color: String, @SerializedName("real_name") val realName: String, val tz: String, @SerializedName("tz_label") val tzLabel: String,
+                         @SerializedName("tz_offset") val tzOffset: Int, val profile: Profile, @SerializedName("is_admin") val isAdmin: Boolean,
+                         @SerializedName("is_owner") val isOwner: Boolean, @SerializedName("is_primary_owner") val isPrimaryOwner: Boolean,
+                         @SerializedName("is_restricted") val isRestricted: Boolean, @SerializedName("is_ultra_restricted") val isUltraRestricted: Boolean,
+                         @SerializedName("is_bot") val isBot: Boolean, val updated: Long,
+                         @SerializedName("is_app_user") val isAppUser: Boolean, @SerializedName("has_2fa") val has2fa: Boolean)
+
+data class Profile(@SerializedName("avatar_hash") val avatarHash: String, @SerializedName("status_text") val statusText: String, @SerializedName("status_emoji") val statusEmoji: String, @SerializedName("real_name") val realName: String, @SerializedName("display_name") val displayName: String, @SerializedName("real_name_normalized") val realNameNormalized: String, @SerializedName("display_name_normalized") val displayNameNormalized: String, val email: String, @SerializedName("image_original") val imageOriginal: String, @SerializedName("image_24") val image24: String, @SerializedName("image_32") val image32: String, @SerializedName("image_48") val image48: String, @SerializedName("image_72") val image72: String, @SerializedName("image_192") val image192: String, @SerializedName("image_512") val image512: String, val team: String)
+
+
 data class Channel(
     val id: String,
     val name: String?,
