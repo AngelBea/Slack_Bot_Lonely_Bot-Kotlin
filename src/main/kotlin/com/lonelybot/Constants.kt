@@ -14,6 +14,7 @@ const val PUBLISH_HOME_URL = "https://slack.com/api/views.publish"
 const val USER_CONVERSATION_URL = "https://slack.com/api/users.conversations"
 const val OPEN_CONVERSATION_URL = "https://slack.com/api/conversations.open"
 const val USER_INFO_URL = "https://slack.com/api/users.info"
+const val BOT_INFO_URL = "https://slack.com/api/bots.info"
 
 /*
 * Headers

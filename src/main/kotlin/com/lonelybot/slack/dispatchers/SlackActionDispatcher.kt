@@ -5,6 +5,7 @@ import com.lonelybot.*
 import com.lonelybot.not.NotionApp
 import com.lonelybot.not.NotionPageBuilder
 import com.lonelybot.services.notion.getCurrentUser
+import com.lonelybot.services.slack.SlackBotService
 import com.lonelybot.slack.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -53,12 +54,15 @@ suspend fun SlackBlockAction.saveLeavingTime() {
 }
 
 suspend fun SlackMessageAction.yellowCard(){
-    val card = Card(user!!.username, NotionTags.YELLOW_COLOUR, message.user!!, channel!!.id)
+    val toUser = message.user ?: SlackBotService.getBotById(message.botId!!).userId
+    val card = Card(user!!.username, NotionTags.YELLOW_COLOUR, toUser, channel!!.id)
     processCardService(card)
 }
 
 suspend fun SlackMessageAction.redCard(){
-    val card = Card(user!!.username, NotionTags.RED_COLOUR, message.user!!, channel!!.id)
+    val toUser = message.user ?: SlackBotService.getBotById(message.botId!!).userId
+    val card = Card(user!!.username, NotionTags.RED_COLOUR, toUser, channel!!.id)
+    
     processCardService(card)
 }
 

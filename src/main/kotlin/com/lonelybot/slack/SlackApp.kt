@@ -136,6 +136,22 @@ object SlackApp{
                     ))
                 }
             }
+            suspend fun getBotInfo(botId: String): HttpResponse{
+                return client.request{
+                    headers {
+                        append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
+                        append(HEADER_CONTENT_TYPE_NAME, "application/x-www-form-urlencoded")
+                    }
+                    
+                    url(BOT_INFO_URL)
+                    method = HttpMethod.Post
+                    setBody(FormDataContent(
+                        Parameters.build { 
+                            append("bot", botId)
+                        }
+                    ))
+                }
+            }
 
            
         }
