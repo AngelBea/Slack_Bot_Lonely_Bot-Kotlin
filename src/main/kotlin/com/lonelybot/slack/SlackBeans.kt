@@ -7,7 +7,9 @@ import com.lonelybot.NotionTags
 data class Params(val token: String, val team_id: String, val team_domain: String, val channel_id: String,
                   val channel_name: String, val user_id: String, val user_name: String, val command: String, val text: String,
                   val api_app_id: String, val is_enterprise_install: String, val response_url: String, val trigger_id: String)
-data class Message(val channel: String, val text: String, val user: String? = null, val username: String = "Señor Feudal Mister Lonely", val blocks: MutableList<SlackBlock> = mutableListOf())
+data class Message(val channel: String, val text: String, val user: String? = null, 
+                   @SerializedName("bot_id") val botId: String? = null, val username: String = "Señor Feudal Mister Lonely", 
+                   val blocks: MutableList<SlackBlock> = mutableListOf())
 
 open class SlackBlock(val type: String, var block_id: String?)
 data class SlackImageBlock(@SerializedName("image_url")val imageUrl: String, @SerializedName("alt_text") val altText: String, val title: SlackText?): SlackBlock(type = BlockType.IMAGE.typeName, block_id = "id_$altText")
@@ -93,3 +95,23 @@ data class SlackEventData(val type: String, val user: String, val channel: Strin
 data class SlackEventAuthorization(@SerializedName("enterprise_id") val enterpriseId: String?, @SerializedName("team_id") val teamId: String,
                                    @SerializedName("user_id") val userId: String, @SerializedName("is_bot") val isBot: Boolean,
                                    @SerializedName("is_enterprise_install") val isEnterpriseInstall: Boolean)
+data class SlackBot(
+    val id: String,
+    val deleted: Boolean,
+    val name: String,
+    val updated: Long,
+    @SerializedName("app_id")
+    val appId: String,
+    @SerializedName("user_id")
+    val userId: String,
+    val icons: SlackBotIcons
+)
+
+data class SlackBotIcons(
+    @SerializedName("image_36")
+    val image36: String,
+    @SerializedName("image_48")
+    val image48: String,
+    @SerializedName("image_72")
+    val image72: String
+)

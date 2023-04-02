@@ -73,7 +73,7 @@ private fun checkCardCommand(parameters: Params, withReason: Boolean = false): C
     val user = REGEX_GET_USER.find(text)?.value ?: ""
     val reason = REGEX_GET_REASON.find(text)?.value ?: ""
 
-    return if (withReason) Card(parameters.user_id, notionColorTag, user, parameters.channel_id, reason)
+    return if (withReason) Card(parameters.user_name, notionColorTag, user, parameters.channel_id, reason)
                 else Card(parameters.user_name, notionColorTag, user, parameters.channel_id)
 }
 
