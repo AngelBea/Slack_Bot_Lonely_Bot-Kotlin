@@ -8,7 +8,7 @@ import com.lonelybot.not.SlackUser
 import io.ktor.client.statement.*
 import io.ktor.utils.io.*
 
-class SlackUserService{
+class NotionSlackUserService{
     companion object: CompanionService {
         override val databaseId: String = "97ca326680654d728548700af7418a72"
 
@@ -31,7 +31,7 @@ class SlackUserService{
                 addRichText("SlackId", slackId)
                 addRichText("SlackTeam", slackTeam)
                 addTitle("Name", name)
-                addMultiSelect("Permissions", Permissions.CARDS.name, Permissions.TIMEREMAINING.name)
+                addMultiSelect("Permissions", Permissions.CARDS.name, Permissions.TIMEREMAINING.name, Permissions.LONELYME.name)
                 addNumber("RedCardsShown", 0)
                 addNumber("YellowCardsShown", 0)
                 addNumber("RedCardsReceived", 0)

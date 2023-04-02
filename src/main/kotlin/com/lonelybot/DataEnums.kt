@@ -8,5 +8,6 @@ enum class NotionTags(val tagName: String, val emote: String){
 
 enum class Permissions{
     TIMEREMAINING,
-    CARDS
+    CARDS,
+    LONELYME
 }

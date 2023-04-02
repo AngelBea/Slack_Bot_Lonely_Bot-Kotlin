@@ -48,8 +48,8 @@ suspend fun SlackBlockAction.saveLeavingTime() {
         addRichText("LeavingRestOfWeek", stateWeek)
     }
 
-    NotionApp.request.post.updatePage(currentUser.id!!, builder)
-    SlackApp.request.post.sendTextMessage(currentUser.slackImChannel.richText.first().plainText!!, "Pstt! Solo te informo de que tus horarios se han guardado.")
+    NotionApp.request.post.updatePage(currentUser.notionId!!, builder)
+    SlackApp.request.post.sendTextMessage(currentUser.slackImChannel!!, "Pstt! Solo te informo de que tus horarios se han guardado.")
 }
 
 suspend fun SlackMessageAction.yellowCard(){

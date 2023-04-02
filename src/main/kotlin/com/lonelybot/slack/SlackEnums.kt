@@ -13,7 +13,8 @@ enum class BlockType(val typeName: String){
 
 enum class SlackCommands(val shortcut: String){
     CARD("/lonelycard"),
-    TIME("/lonelyrun")    
+    TIME("/lonelyrun"),
+    ME("/lonelyme")
 }
 
 enum class ElementType(val typeName: String){
@@ -33,5 +34,6 @@ enum class ElementType(val typeName: String){
 
 enum class ViewTypes(val typeName: String){
     APP_HOME("home"),
-    MODAL("modal")
+    MODAL("modal"),
+    MESSAGE("message")
 }

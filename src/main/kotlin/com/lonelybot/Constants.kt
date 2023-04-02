@@ -1,6 +1,6 @@
 package com.lonelybot
 
-import com.lonelybot.not.SlackUser
+import com.lonelybot.adapters.SlackUserAdapter
 import java.sql.Time
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -13,6 +13,7 @@ const val HIDDEN_MESSAGE_URL = "https://slack.com/api/chat.postEphemeral"
 const val PUBLISH_HOME_URL = "https://slack.com/api/views.publish"
 const val USER_CONVERSATION_URL = "https://slack.com/api/users.conversations"
 const val OPEN_CONVERSATION_URL = "https://slack.com/api/conversations.open"
+const val USER_INFO_URL = "https://slack.com/api/users.info"
 
 /*
 * Headers
@@ -79,8 +80,8 @@ const val YOU_SHOULD_NOT_BE_HERE = "¿Tu no te habías ido ya o quieres seguir t
 * View Texts
  */
 
-val VIEW_HOME_MESSAGE_MR_LONELY = {user: SlackUser -> """Hola <@${user.slackId.richText.first().plainText}> me gusta tener a mis esbirros controlados. Dime aquí lo que haces mientras yo no te veo."""}
-val VIEW_HOME_IMAGE_MR_LONELY = "https://i.imgur.com/adR1WUq.png"
+val VIEW_HOME_MESSAGE_MR_LONELY = {user: SlackUserAdapter -> """Hola <@${user.slackId}> me gusta tener a mis esbirros controlados. Dime aquí lo que haces mientras yo no te veo."""}
+val VIEW_HOME_IMAGE_MR_LONELY = "https://i.imgur.com/qAXUaZI.png"
 val VIEW_HOME_ALT_MR_LONELY = "Mr. Lonely"
 
 val VIEW_HOME_DATEPICKER_FRIDAY = "¿A que hora te piensas ir los Viernes?"

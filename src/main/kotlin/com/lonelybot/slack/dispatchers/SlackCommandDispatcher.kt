@@ -3,10 +3,12 @@ package com.lonelybot.slack.dispatchers
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.lonelybot.*
+import com.lonelybot.adapters.SlackUserAdapter
 import com.lonelybot.not.*
 import com.lonelybot.not.Meme
 import com.lonelybot.services.notion.getCurrentUser
 import com.lonelybot.services.notion.isPermitted
+import com.lonelybot.services.slack.SlackUserService
 import com.lonelybot.slack.*
 import com.lonelybot.slack.builders.SlackBlockBuilder
 import io.ktor.client.statement.*
@@ -46,6 +48,7 @@ fun Route.commandReader() {
                 SlackCommands.TIME -> {
                     processGetTimeRemaining(parameters) 
                 }
+                SlackCommands.ME -> processLonelyMe(parameters)
                 else -> {
                     SlackApp.request.post.sendTextMessage(
                         parameters.channel_id,
@@ -114,10 +117,10 @@ private suspend fun processGetTimeRemaining(parameters: Params){
         return
     }
     
-    val leavingHourFriday = currentUser.leavingOnFriday?.richText?.firstOrNull()?.plainText
-    val leavingHourWeek = currentUser.leavingRestOfWeek.richText.firstOrNull()?.plainText
+    val leavingHourFriday = currentUser.leavingOnFriday
+    val leavingHourWeek = currentUser.leavingRestOfWeek
     if (leavingHourFriday == null || leavingHourWeek == null){
-        val userIm = currentUser.slackImChannel.richText.first().plainText
+        val userIm = currentUser.slackImChannel
         SlackApp.request.post.sendTextMessage(userIm!!, REMAINING_TIME_MSG)
         return
     }
@@ -201,6 +204,25 @@ private fun calculateHours(now: ZonedDateTime, fridayDate: LocalDateTime, weekDa
     return "${hours.first - ((24 - 8) * hourGap)} horas, ${minutes.first} minutos y ${minutes.second} segundos de agonia"
 }
 
-fun processCommandSuggest(){
-
+suspend fun processLonelyMe(parameters: Params){
+    val currentUser = getCurrentUser(parameters)
+    if (!currentUser.isPermitted(Permissions.LONELYME)){
+        SlackApp.request.post.sendHiddenMessage(parameters.channel_id, COMMAND_OR_ACTION_BLOCKED, parameters.user_id)
+        return
+    }
+    
+    val messageBlock = SlackBlockBuilder{
+        addImage("https://i.imgur.com/UyAXgQj.png", "Banner Lonely Me")
+        addImageSection("Te identifico como el esbirro <@${currentUser.slackId}>", currentUser.profileImgFull, currentUser.slackUserName)
+        addDivider()
+        addTextSection(":large_yellow_square::arrow_forward: Te han castigado con ${currentUser.yellowCardsShown} amarillas.")
+        addTextSection(":large_yellow_square::arrow_backward: Has castigado con ${currentUser.yellowCardsReceived} amarillas")
+        addTextSection(":large_red_square::arrow_forward: Has expulsado a alguien ${currentUser.redCardsShown} veces")
+        addTextSection(":large_red_square::arrow_backward: Te han expulsado ${currentUser.redCardsReceived} veces")
+        addTextSection(":calendar: Empiezas a holgazanear a las ${currentUser.leavingOnFriday} el Viernes")
+        addTextSection(":calendar: Entre semana a las ${currentUser.leavingRestOfWeek}")
+    }
+    
+    SlackApp.request.post.sendBlockedMessage(parameters.channel_id, messageBlock)
+    
 }
