@@ -2,8 +2,10 @@ package com.lonelybot.slack.dispatchers
 
 import com.google.gson.Gson
 import com.lonelybot.*
+import com.lonelybot.adapters.SlackUserAdapter
 import com.lonelybot.not.NotionApp
 import com.lonelybot.not.NotionPageBuilder
+import com.lonelybot.services.notion.BadUserException
 import com.lonelybot.services.notion.getCurrentUser
 import com.lonelybot.services.slack.SlackBotService
 import com.lonelybot.slack.*
@@ -54,14 +56,36 @@ suspend fun SlackBlockAction.saveLeavingTime() {
 }
 
 suspend fun SlackMessageAction.yellowCard(){
-    val toUser = message.user ?: SlackBotService.getBotById(message.botId!!).userId
-    val card = Card(user!!.username, NotionTags.YELLOW_COLOUR, toUser, channel!!.id)
+    var toUser: String
+    try{
+        if (message.user == null){
+            throw BadUserException()  
+        }else{
+            toUser = message.user 
+        }     
+    }catch(exc: BadUserException){
+        SlackApp.request.post.sendHiddenMessage(channel!!.id, exc.message, user!!.id)
+        return
+    }
+    
+    val card = Card(user!!.id, NotionTags.YELLOW_COLOUR, toUser, channel!!.id, teamId = team!!.id)
     processCardService(card)
 }
 
 suspend fun SlackMessageAction.redCard(){
-    val toUser = message.user ?: SlackBotService.getBotById(message.botId!!).userId
-    val card = Card(user!!.username, NotionTags.RED_COLOUR, toUser, channel!!.id)
+    var toUser: String
+    try{
+        if (message.user == null){
+            throw BadUserException()
+        }else{
+            toUser = message.user
+        }
+    }catch(exc: BadUserException){
+        SlackApp.request.post.sendHiddenMessage(channel!!.id, exc.message, user!!.id)
+        return
+    }
+    
+    val card = Card(user!!.id, NotionTags.RED_COLOUR, toUser, channel!!.id, teamId = team!!.id)
     
     processCardService(card)
 }

@@ -6,8 +6,10 @@ import com.lonelybot.*
 import com.lonelybot.adapters.SlackUserAdapter
 import com.lonelybot.not.*
 import com.lonelybot.not.Meme
+import com.lonelybot.services.notion.BadUserException
 import com.lonelybot.services.notion.getCurrentUser
 import com.lonelybot.services.notion.isPermitted
+import com.lonelybot.services.notion.updateCardStatsForUsers
 import com.lonelybot.services.slack.SlackUserService
 import com.lonelybot.slack.*
 import com.lonelybot.slack.builders.SlackBlockBuilder
@@ -73,14 +75,25 @@ private fun checkCardCommand(parameters: Params, withReason: Boolean = false): C
     val user = REGEX_GET_USER.find(text)?.value ?: ""
     val reason = REGEX_GET_REASON.find(text)?.value ?: ""
 
-    return if (withReason) Card(parameters.user_name, notionColorTag, user, parameters.channel_id, reason)
-                else Card(parameters.user_name, notionColorTag, user, parameters.channel_id)
+    return if (withReason) Card(parameters.user_id, notionColorTag, user, parameters.channel_id, reason, parameters.team_id)
+                else Card(parameters.user_id, notionColorTag, user, parameters.channel_id, teamId = parameters.team_id)
 }
 
 suspend fun processCardService(card: Card) {
-    card.let(::println)
-    val username = card.toUser
-
+    val fromUser = getCurrentUser(card.fromUser, card.teamId)
+    if (!fromUser.isPermitted(Permissions.CARDS)){
+        SlackApp.request.post.sendHiddenMessage(card.onChannel, COMMAND_OR_ACTION_BLOCKED, fromUser.slackId)
+        return
+    }
+    var toUser: SlackUserAdapter
+    
+    try {
+        toUser = getCurrentUser(card.toUser, card.teamId, false)        
+    }catch (exc: BadUserException){
+        SlackApp.request.post.sendHiddenMessage(card.onChannel, exc.message, fromUser.slackId)
+        return
+    }
+    
     val notionFilter = NotionFilterBuilder.build {
         this.contains("Tags", NotionTypes.MULTI_SELECT, "Tarjeta")
         this.contains("Tags", NotionTypes.MULTI_SELECT, card.color.tagName)
@@ -98,16 +111,18 @@ suspend fun processCardService(card: Card) {
 
     val builder = SlackBlockBuilder{
         addContext { 
-            addMarkdownText("<@${card.fromUser}> ha sacado ${card.color.emote} a <@${username}> por ${card.reason ?: "los loles"}")
+            addMarkdownText("<@${card.fromUser}> ha sacado ${card.color.emote} a <@${card.toUser}> por ${card.reason ?: "los loles"}")
         }
         addImage(
             cardMemes.first().url.richText.first().href ?: ""
             , cardMemes.first().name.title.first().plainText ?: ""
-            , "${card.color.tagName} de <@${card.fromUser}>"
+            , "${card.color.tagName} de <@${fromUser.slackUserName}>"
         )
     }
-
+    
+    
     SlackApp.request.post.sendBlockedMessage(card.onChannel, builder)
+    updateCardStatsForUsers(fromUser, card.color.tagName, toUser)
 }
 
 private suspend fun processGetTimeRemaining(parameters: Params){
