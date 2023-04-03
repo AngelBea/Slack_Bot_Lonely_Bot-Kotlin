@@ -40,7 +40,7 @@ data class SlackHomeView(val blocks: MutableList<SlackBlock>): SlackView(ViewTyp
 
 data class SlackOption(val text: SlackTextElement, val value: String, val description: SlackTextElement? = null)
 
-data class Card(val fromUser: String, val color: NotionTags, val toUser: String, val onChannel: String, val reason: String? = null)
+data class Card(val fromUser: String, val color: NotionTags, val toUser: String, val onChannel: String, val reason: String? = null, val teamId: String)
 
 open class SlackAction(val type: String?, val team: Team?, val user: User?, val channel: Channel?, @SerializedName("callback_id") val callbackId: String?, 
                               @SerializedName("response_url") val responseUrl: String?)
