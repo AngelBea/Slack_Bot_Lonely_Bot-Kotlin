@@ -167,31 +167,31 @@ private fun calculateHours(now: ZonedDateTime, fridayDate: LocalDateTime, weekDa
     val fridayAtThree = when (now.dayOfWeek) {
         DayOfWeek.MONDAY -> with(now.plusDays(4)) {
             hourGap = 4
-            fridayDate.atZone(ZONE_OFFSET)
+            fridayDate.plusDays(hourGap.toLong()).atZone(ZONE_OFFSET)
         }
         DayOfWeek.TUESDAY -> with(now.plusDays(3)) {
             hourGap = 3
-            fridayDate.atZone(ZONE_OFFSET)
+            fridayDate.plusDays(hourGap.toLong()).atZone(ZONE_OFFSET)
         }
         DayOfWeek.WEDNESDAY -> with(now.plusDays(2)) {
             hourGap = 2
-            fridayDate.atZone(ZONE_OFFSET)
+            fridayDate.plusDays(hourGap.toLong()).atZone(ZONE_OFFSET)
         }
         DayOfWeek.THURSDAY -> with(now.plusDays(1)) {
             hourGap = 1
-            fridayDate.atZone(ZONE_OFFSET)
+            fridayDate.plusDays(hourGap.toLong()).atZone(ZONE_OFFSET)
         }
         DayOfWeek.FRIDAY -> with(now.plusDays(0)) {
             hourGap = 0
-            fridayDate.atZone(ZONE_OFFSET)
+            fridayDate.plusDays(hourGap.toLong()).atZone(ZONE_OFFSET)
         }
         DayOfWeek.SATURDAY -> with(now.plusDays(6)) {
             hourGap = 6
-            fridayDate.atZone(ZONE_OFFSET)
+            fridayDate.plusDays(hourGap.toLong()).atZone(ZONE_OFFSET)
         }
         DayOfWeek.SUNDAY -> with(now.plusDays(5)) {
             hourGap = 5
-            fridayDate.atZone(ZONE_OFFSET)
+            fridayDate.plusDays(hourGap.toLong()).atZone(ZONE_OFFSET)
         }
     }
 
