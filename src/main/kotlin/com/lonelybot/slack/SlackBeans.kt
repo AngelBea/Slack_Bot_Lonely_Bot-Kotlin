@@ -3,6 +3,7 @@ package com.lonelybot.slack
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import com.lonelybot.NotionTags
+import java.io.Serial
 
 data class Params(val token: String, val team_id: String, val team_domain: String, val channel_id: String,
                   val channel_name: String, val user_id: String, val user_name: String, val command: String, val text: String,
@@ -18,14 +19,16 @@ data class SlackMultiSection(val fields: List<SlackTextElement>): SlackBlock(Blo
 data class SlackAccessorySection(val text: SlackTextElement, val accessory: SlackAccessory): SlackBlock(BlockType.SECTION.typeName, null)
 class SlackDivider: SlackBlock(BlockType.DIVIDER.typeName, null)
 data class SlackHeader(val text: SlackText): SlackBlock(BlockType.HEADER.typeName, null)
+data class SlackInput(val element: InputElement, val label: SlackText): SlackBlock(BlockType.INPUT.typeName, null)
 
 open class Element(val type: String?)
 interface SlackTextElement
 interface SlackAccessory
 data class SlackText(val text: String) : Element(ElementType.TEXT.typeName), SlackTextElement
 data class SlackMarkdown(val text: String) : Element(ElementType.MARKDOWN.typeName), SlackTextElement
-data class SlackUserSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String): Element(ElementType.USERS_SELECT.typeName), SlackAccessory
+data class SlackUserSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String, @SerializedName("initial_user") val initialUser: String?): Element(ElementType.USERS_SELECT.typeName), SlackAccessory
 data class SlackMultiConversationSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String): Element(ElementType.MULTI_CONVERSATIONS_SELECT.typeName), SlackAccessory
+data class SlackConversationSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String, @SerializedName("initial_conversation") val initialConversation: String? = null): Element(ElementType.CONVERSATIONS_SELECT.typeName), SlackAccessory
 data class SlackStaticSelect(val placeholder: SlackText, val options: MutableList<SlackOption>): Element(ElementType.STATIC_SELECT.typeName), SlackAccessory
 data class SlackImage(@SerializedName("image_url")val imageUrl: String, @SerializedName("alt_text") val altText: String): Element(ElementType.IMAGE.typeName), SlackAccessory
 data class SlackButton(val text: SlackText, val value: String, @SerializedName("action_id") val actionId: String): Element(ElementType.BUTTON.typeName), SlackAccessory
@@ -34,17 +37,21 @@ data class SlackDatePicker(val placeholder: SlackText, @SerializedName("action_i
 data class SlackTimePicker(val placeholder: SlackText, @SerializedName("action_id") val actionId: String, @SerializedName("initial_time") val initialTime: String): Element(ElementType.TIMEPICKER.typeName), SlackAccessory
 data class SlackCheckboxes(val options: MutableList<SlackOption>, @SerializedName("action_id") val actionId: String): Element(ElementType.CHECKBOXES.typeName), SlackAccessory 
 data class SlackRadioButtons(val options: MutableList<SlackOption>, @SerializedName("action_id") val actionId: String): Element(ElementType.RADIO_BUTTONS.typeName), SlackAccessory 
-
-open class SlackView(val type: String)
-data class SlackHomeView(val blocks: MutableList<SlackBlock>): SlackView(ViewTypes.APP_HOME.typeName)
-
 data class SlackOption(val text: SlackTextElement, val value: String, val description: SlackTextElement? = null)
+
+open class SlackView(val type: String, @SerializedName("external_id") var external_id: String?)
+data class SlackHomeView(val blocks: MutableList<SlackBlock>): SlackView(ViewTypes.APP_HOME.typeName, null)
+data class SlackModalView(val title: SlackText?, val submit: SlackText?, val close: SlackText?, val blocks: MutableList<SlackBlock>): SlackView(ViewTypes.MODAL.typeName, null)
+
+
+open class InputElement(val type: String)
+data class PlainTextInputElement(val multiline: Boolean, @SerializedName("action_id") val actionId: String) : InputElement(ElementType.PLAIN_TEXT_INPUT.typeName)
 
 data class Card(val fromUser: String, val color: NotionTags, val toUser: String, val onChannel: String, val reason: String? = null, val teamId: String)
 
 open class SlackAction(val type: String?, val team: Team?, val user: User?, val channel: Channel?, @SerializedName("callback_id") val callbackId: String?, 
-                              @SerializedName("response_url") val responseUrl: String?)
-data class SlackMessageAction(val message: Message): SlackAction(null, null, null, null, null, null)
+                              @SerializedName("response_url") val responseUrl: String?, @SerializedName("trigger_id") val triggerId: String?)
+data class SlackMessageAction(val message: Message): SlackAction(null, null, null, null, null, null, null)
 data class SlackValues(val values: JsonObject)
 
 

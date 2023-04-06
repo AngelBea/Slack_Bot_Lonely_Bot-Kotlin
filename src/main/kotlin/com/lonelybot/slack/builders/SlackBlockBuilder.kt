@@ -34,23 +34,33 @@ class SlackBlockBuilder(builder: SlackBlockBuilder.() -> Unit) {
         return this
     }
     
-    fun addUserSelectionSection(text: String, placeholder: String, actionId: String, isTextMarkdown: Boolean = true): SlackBlockBuilder {
+    fun addUserSelectionSection(text: String, placeholder: String, actionId: String, initialUser: String? = null, isTextMarkdown: Boolean = true): SlackBlockBuilder {
         val textElement = checkMarkdownText(text, isTextMarkdown)
         
-        val selectUser = SlackUserSelect(SlackText(placeholder), actionId)
+        val selectUser = SlackUserSelect(SlackText(placeholder), actionId, initialUser)
         
         blocks.add(SlackAccessorySection(textElement, selectUser))
         
         return this
     }
     
-    fun addConversationSelectionSection(text: String, placeholder: String, actionId: String, isTextMarkdown: Boolean = true): SlackBlockBuilder {
+    fun addConversationsSelectionSection(text: String, placeholder: String, actionId: String, isTextMarkdown: Boolean = true): SlackBlockBuilder {
         val textElement = checkMarkdownText(text, isTextMarkdown)
         
-        val selectUser = SlackMultiConversationSelect(SlackText(placeholder), actionId)
+        val selectConversations = SlackMultiConversationSelect(SlackText(placeholder), actionId)
         
-        blocks.add(SlackAccessorySection(textElement, selectUser))
+        blocks.add(SlackAccessorySection(textElement, selectConversations))
         
+        return this
+    }
+
+    fun addConversationSelectionSection(text: String, placeholder: String, actionId: String, initialChannel: String? = null, isTextMarkdown: Boolean = true): SlackBlockBuilder {
+        val textElement = checkMarkdownText(text, isTextMarkdown)
+
+        val selectConversation = SlackConversationSelect(SlackText(placeholder), actionId, initialChannel)
+
+        blocks.add(SlackAccessorySection(textElement, selectConversation))
+
         return this
     }
     
@@ -193,6 +203,17 @@ class SlackBlockBuilder(builder: SlackBlockBuilder.() -> Unit) {
         val context = SlackContextBuilder {}.apply(contextBuilder)
         
         blocks.add(context)
+        
+        return this
+    }
+    
+    fun addPlainTextInput(multiline: Boolean, actionId: String, label: String): SlackBlockBuilder{
+        val plainTextInput = PlainTextInputElement(multiline, actionId)
+        val textLabel = SlackText(label)
+        
+        val input = SlackInput(plainTextInput, textLabel) 
+        
+        blocks.add(input)
         
         return this
     }

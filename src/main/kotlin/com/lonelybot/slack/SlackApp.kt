@@ -88,6 +88,20 @@ object SlackApp{
                     setBody(viewBuilder.toJson())
                 }
             }
+            
+            suspend fun openModal(viewBuilder: SlackViewBuilder): HttpResponse {
+                return client.request{                    
+                    headers {
+                        append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
+                        append(HEADER_CONTENT_TYPE_NAME, "application/json")
+                    }
+
+                    url(OPEN_MODAL_URL)
+                    method = HttpMethod.Post
+
+                    setBody(viewBuilder.toJson())
+                }
+            }
 
             suspend fun openUserConversation(userId: String? = null, returnIm: Boolean?): HttpResponse{
                 return client.request{

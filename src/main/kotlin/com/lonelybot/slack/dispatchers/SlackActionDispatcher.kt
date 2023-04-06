@@ -7,19 +7,23 @@ import com.lonelybot.not.NotionApp
 import com.lonelybot.not.NotionPageBuilder
 import com.lonelybot.services.notion.BadUserException
 import com.lonelybot.services.notion.getCurrentUser
+import com.lonelybot.services.notion.isPermitted
 import com.lonelybot.services.slack.SlackBotService
 import com.lonelybot.slack.*
+import com.lonelybot.slack.factories.ViewFactory
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.launch
 
 fun Route.actionReader(){
     post ("/actions"){        
-        val parameters = call.receiveParameters()["payload"]
-        parameters.let(::println)
+        val parametersReceived = call.receiveParameters()
+        val parameters = parametersReceived["payload"] ?: call.receiveChannel().readUTF8Line()
+        "PARAMETERS -> $parameters".let(::println)
         val action = Gson().fromJson(parameters.toString(), SlackAction::class.java)
         
         launch {
@@ -28,11 +32,21 @@ fun Route.actionReader(){
                 "yellow_card" -> getActionAs<SlackMessageAction>(parameters).yellowCard()
                 "red_card" -> getActionAs<SlackMessageAction>(parameters).redCard()
                 null -> {
-                    val actionBlock = getActionAs<SlackBlockAction>(parameters)
-
-                    when(val actionId = actionBlock.getActionId()){
-                        "save-time-remaining" -> actionBlock.saveLeavingTime()
+                    if (action.type == "view_submission"){
+                        val viewSubmission = getActionAs<SlackViewSubmission>(parameters)
+                        
+                        when(viewSubmission.getExternalId()){
+                            VIEW_MODAL_YELLOW_CARD_ID -> viewSubmission.yellowCard()
+                            VIEW_MODAL_RED_CARD_ID -> viewSubmission.redCard()
+                        }
+                    }else{
+                        val actionBlock = getActionAs<SlackBlockAction>(parameters)
+    
+                        when(actionBlock.getActionId()){
+                            "save-time-remaining" -> actionBlock.saveLeavingTime()
+                        }                        
                     }
+                    
                 }
             }
         }
@@ -68,10 +82,25 @@ suspend fun SlackMessageAction.yellowCard(){
         return
     }
     
-    val card = Card(user!!.id, NotionTags.YELLOW_COLOUR, toUser, channel!!.id, teamId = team!!.id)
-    processCardService(card)
+    val fromUser = getCurrentUser(this)
+    if (!fromUser.isPermitted(Permissions.CARDS)){
+        SlackApp.request.post.sendHiddenMessage(channel!!.id, COMMAND_OR_ACTION_BLOCKED, fromUser.slackId)
+        return
+    }
+    
+    val toUserAd = getCurrentUser(message.user, team!!.id)
+    ViewFactory.buildModalYellowCard(fromUser, toUserAd, triggerId!!, channel!!.id).deploy()
 }
 
+suspend fun SlackViewSubmission.yellowCard(){
+    val toUser = getStateOf<String>(VIEW_MODAL_YELLOW_CARD_USER_BLOCK_ID, VIEW_MODAL_YELLOW_USER_CARD_ACTION_ID, "selected_user")
+    val reason = getStateOf<String>(VIEW_MODAL_YELLOW_CARD_TEXT_BLOCK_ID, VIEW_MODAL_YELLOW_CARD_TEXT_ACTION_ID, "value")
+    val channel = getStateOf<String>(VIEW_MODAL_YELLOW_CARD_CHANNEL_BLOCK_ID, VIEW_MODAL_YELLOW_CARD_CHANNEL_ACTION_ID, "selected_conversation")
+    
+    this.let(::println)
+    val card = Card(user!!.id, NotionTags.YELLOW_COLOUR, toUser, channel, reason, team!!.id)
+    processCardService(card)
+}
 suspend fun SlackMessageAction.redCard(){
     var toUser: String
     try{
@@ -84,12 +113,26 @@ suspend fun SlackMessageAction.redCard(){
         SlackApp.request.post.sendHiddenMessage(channel!!.id, exc.message, user!!.id)
         return
     }
-    
-    val card = Card(user!!.id, NotionTags.RED_COLOUR, toUser, channel!!.id, teamId = team!!.id)
-    
-    processCardService(card)
+
+    val fromUser = getCurrentUser(this)
+    if (!fromUser.isPermitted(Permissions.CARDS)){
+        SlackApp.request.post.sendHiddenMessage(channel!!.id, COMMAND_OR_ACTION_BLOCKED, fromUser.slackId)
+        return
+    }
+
+    val toUserAd = getCurrentUser(message.user, team!!.id)
+    ViewFactory.buildModalRedCard(fromUser, toUserAd, triggerId!!, channel!!.id).deploy()
 }
 
+suspend fun SlackViewSubmission.redCard(){
+    val toUser = getStateOf<String>(VIEW_MODAL_RED_CARD_USER_BLOCK_ID, VIEW_MODAL_RED_USER_CARD_ACTION_ID, "selected_user")
+    val reason = getStateOf<String>(VIEW_MODAL_RED_CARD_TEXT_BLOCK_ID, VIEW_MODAL_RED_CARD_TEXT_ACTION_ID, "value")
+    val channel = getStateOf<String>(VIEW_MODAL_RED_CARD_CHANNEL_BLOCK_ID, VIEW_MODAL_RED_CARD_CHANNEL_ACTION_ID, "selected_conversation")
+    
+    val card = Card(user!!.id, NotionTags.RED_COLOUR, toUser, channel, reason, team!!.id)
+
+    processCardService(card)
+}
 inline fun <reified T> getActionAs(json: String?) : T{
     return Gson().fromJson(json, T::class.java)
 }

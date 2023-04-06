@@ -230,14 +230,13 @@ suspend fun processLonelyMe(parameters: Params){
         addImage("https://i.imgur.com/UyAXgQj.png", "Banner Lonely Me")
         addImageSection("Te identifico como el esbirro <@${currentUser.slackId}>", currentUser.profileImgFull, currentUser.slackUserName)
         addDivider()
-        addTextSection(":large_yellow_square::arrow_forward: Te han castigado con ${currentUser.yellowCardsShown} amarillas.")
-        addTextSection(":large_yellow_square::arrow_backward: Has castigado con ${currentUser.yellowCardsReceived} amarillas")
+        addTextSection(":large_yellow_square::arrow_forward: Te han castigado con ${currentUser.yellowCardsReceived} amarillas.")
+        addTextSection(":large_yellow_square::arrow_backward: Has castigado con ${currentUser.yellowCardsShown} amarillas")
         addTextSection(":large_red_square::arrow_forward: Has expulsado a alguien ${currentUser.redCardsShown} veces")
         addTextSection(":large_red_square::arrow_backward: Te han expulsado ${currentUser.redCardsReceived} veces")
         addTextSection(":calendar: Empiezas a holgazanear a las ${currentUser.leavingOnFriday} el Viernes")
         addTextSection(":calendar: Entre semana a las ${currentUser.leavingRestOfWeek}")
     }
     
-    SlackApp.request.post.sendBlockedMessage(parameters.channel_id, messageBlock)
-    
+    SlackApp.request.post.sendBlockedMessage(parameters.channel_id, messageBlock)    
 }
