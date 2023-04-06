@@ -24,12 +24,14 @@ enum class ElementType(val typeName: String){
     USERS_SELECT("users_select"),
     STATIC_SELECT("static_select"),
     MULTI_CONVERSATIONS_SELECT("multi_conversations_select"),
+    CONVERSATIONS_SELECT("conversations_select"),
     BUTTON("button"),    
     OVERFLOW("overflow"),
     DATE_PICKER("datepicker"),
     CHECKBOXES("checkboxes"),
     RADIO_BUTTONS("radio_buttons"),
-    TIMEPICKER("timepicker")
+    TIMEPICKER("timepicker"),
+    PLAIN_TEXT_INPUT("plain_text_input")
 }
 
 enum class ViewTypes(val typeName: String){
