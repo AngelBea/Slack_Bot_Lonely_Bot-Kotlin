@@ -6,7 +6,7 @@ import com.lonelybot.slack.SlackText
 
 class SlackModalBuilder(builder: SlackModalBuilder.() -> Unit) {
     private lateinit var modalTitle: SlackText
-    private lateinit var modalSubmit: SlackText
+    private var modalSubmit: SlackText? = null
     private lateinit var modalClose: SlackText
     private lateinit var modalBlocks: MutableList<SlackBlock>
     private lateinit var modalView: SlackModalView
@@ -35,8 +35,7 @@ class SlackModalBuilder(builder: SlackModalBuilder.() -> Unit) {
     }
     
     fun build(): SlackModalView{
-        modalTitle = if (this::modalTitle.isInitialized) modalTitle else SlackText("My App") 
-        modalSubmit = if (this::modalSubmit.isInitialized) modalSubmit else SlackText("Send") 
+        modalTitle = if (this::modalTitle.isInitialized) modalTitle else SlackText("My App")
         modalClose = if (this::modalClose.isInitialized) modalClose else SlackText("Cancel") 
         modalBlocks = if (this::modalBlocks.isInitialized) modalBlocks else SlackBlockBuilder{ addTextSection("I'm a modal, look at me! :eyes:") }.blocks
         return SlackModalView(modalTitle, modalSubmit, modalClose, modalBlocks)
