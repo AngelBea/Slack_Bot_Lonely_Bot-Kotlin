@@ -11,6 +11,7 @@ class SlackViewBuilder(builder: SlackViewBuilder.() -> Unit) {
     @SerializedName("user_id") private lateinit var userId: String
     private lateinit var view: SlackView
     @SerializedName("trigger_id") private lateinit var triggerId: String
+    @SerializedName("external_id") private lateinit var externalId: String
     
     
     init{
@@ -49,6 +50,18 @@ class SlackViewBuilder(builder: SlackViewBuilder.() -> Unit) {
             is SlackModalView -> {
                 this.toJson().let(::println)
                 SlackApp.request.post.openModal(this)
+            }
+        }
+    }
+    
+    suspend fun update(externalId: String){
+        when(this.view){
+            is SlackHomeView -> {
+                SlackApp.request.post.publishView(this)
+            }
+            is SlackModalView -> {
+                this.externalId = externalId
+                SlackApp.request.post.updateModal(this)
             }
         }
     }

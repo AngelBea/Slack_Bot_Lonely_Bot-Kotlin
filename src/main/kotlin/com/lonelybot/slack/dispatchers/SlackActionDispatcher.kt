@@ -70,6 +70,7 @@ suspend fun SlackBlockAction.saveLeavingTime() {
 }
 
 suspend fun SlackMessageAction.yellowCard(){
+    ViewFactory.buildLoadingModal(VIEW_MODAL_YELLOW_CARD_ID, triggerId!!).deploy()
     var toUser: String
     try{
         if (message.user == null){
@@ -89,7 +90,7 @@ suspend fun SlackMessageAction.yellowCard(){
     }
     
     val toUserAd = getCurrentUser(message.user, team!!.id)
-    ViewFactory.buildModalYellowCard(fromUser, toUserAd, triggerId!!, channel!!.id).deploy()
+    ViewFactory.buildModalYellowCard(fromUser, toUserAd, triggerId!!, channel!!.id).update(VIEW_MODAL_YELLOW_CARD_ID)
 }
 
 suspend fun SlackViewSubmission.yellowCard(){
@@ -102,6 +103,7 @@ suspend fun SlackViewSubmission.yellowCard(){
     processCardService(card)
 }
 suspend fun SlackMessageAction.redCard(){
+    ViewFactory.buildLoadingModal(VIEW_MODAL_RED_CARD_ID, triggerId!!).deploy()
     var toUser: String
     try{
         if (message.user == null){
@@ -121,7 +123,7 @@ suspend fun SlackMessageAction.redCard(){
     }
 
     val toUserAd = getCurrentUser(message.user, team!!.id)
-    ViewFactory.buildModalRedCard(fromUser, toUserAd, triggerId!!, channel!!.id).deploy()
+    ViewFactory.buildModalRedCard(fromUser, toUserAd, triggerId!!, channel!!.id).update(VIEW_MODAL_RED_CARD_ID)
 }
 
 suspend fun SlackViewSubmission.redCard(){

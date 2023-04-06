@@ -3,6 +3,7 @@ package com.lonelybot.slack.factories
 import com.lonelybot.*
 import com.lonelybot.adapters.SlackUserAdapter
 import com.lonelybot.services.notion.isPermitted
+import com.lonelybot.slack.builders.SlackModalBuilder
 import com.lonelybot.slack.builders.SlackViewBuilder
 import java.sql.Time
 
@@ -31,6 +32,18 @@ class ViewFactory {
                     }
                 }
             }   
+        }
+        
+        fun buildLoadingModal(externalId: String, triggerId: String): SlackViewBuilder{
+            return SlackViewBuilder{
+                modal(triggerId){
+                    title("Cargando...")
+                    close("Cancelar")
+                    blocks { 
+                        addImage("https://i.imgur.com/IfjQjcJ.gif", "Loading")
+                    }
+                }
+            } byId externalId
         }
         
         fun buildModalYellowCard(fromUser: SlackUserAdapter, toUser: SlackUserAdapter, triggerId: String, channelId: String): SlackViewBuilder{
