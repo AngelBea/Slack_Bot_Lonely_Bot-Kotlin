@@ -126,8 +126,20 @@ object SlackApp{
 
                     url(OPEN_CONVERSATION_URL)
                     method = HttpMethod.Post
-                    val map = mapOf("return_im" to returnIm, "users" to userId)
-                    Gson().toJson(map).let(::println)
+                    val map = mapOf("return_im" to returnIm, "users" to userId)                    
+                    setBody(Gson().toJson(map))
+                }
+            }
+            suspend fun kickUserFromChannel(userId: String, channel: String): HttpResponse{
+                return client.request{
+                    headers {
+                        append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
+                        append(HEADER_CONTENT_TYPE_NAME, "application/json")
+                    }
+
+                    url(KICK_USER_URL)
+                    method = HttpMethod.Post
+                    val map = mapOf("channel" to channel, "user" to userId)                    
                     setBody(Gson().toJson(map))
                 }
             }
@@ -164,6 +176,7 @@ object SlackApp{
                     ))
                 }
             }
+            
             suspend fun getBotInfo(botId: String): HttpResponse{
                 return client.request{
                     headers {

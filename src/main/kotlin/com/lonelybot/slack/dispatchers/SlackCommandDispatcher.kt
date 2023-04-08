@@ -10,6 +10,7 @@ import com.lonelybot.services.notion.BadUserException
 import com.lonelybot.services.notion.getCurrentUser
 import com.lonelybot.services.notion.isPermitted
 import com.lonelybot.services.notion.updateCardStatsForUsers
+import com.lonelybot.services.slack.SlackChannelService
 import com.lonelybot.services.slack.SlackUserService
 import com.lonelybot.slack.*
 import com.lonelybot.slack.builders.SlackBlockBuilder
@@ -123,6 +124,7 @@ suspend fun processCardService(card: Card) {
     
     SlackApp.request.post.sendBlockedMessage(card.onChannel, builder)
     updateCardStatsForUsers(fromUser, card.color.tagName, toUser)
+    if (card.color.tagName == NotionTags.RED_COLOUR.tagName) SlackChannelService.kickUser(fromUser, toUser, card.onChannel, true)
 }
 
 private suspend fun processGetTimeRemaining(parameters: Params){
