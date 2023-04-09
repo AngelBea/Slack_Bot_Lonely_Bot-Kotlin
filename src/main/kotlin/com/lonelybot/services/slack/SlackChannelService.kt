@@ -30,7 +30,7 @@ class SlackChannelService {
             if (talkative){
                 when(genericResponse.error){
                     "cant_kick_from_general" -> SlackApp.request.post.sendHiddenMessage(channelId, "No puedes echar a <@$toUser> de #general", fromUser.slackId)
-                    null -> SlackApp.request.post.sendHiddenMessage(channelId, "<@${fromUser.slackId}> te ha echado de <@$channelId>.", toUser.slackId)
+                    null -> SlackApp.request.post.sendHiddenMessage(toUser.slackImChannel!!, "<@${fromUser.slackId}> te ha echado de <#$channelId>.", toUser.slackId)
                 }
             }
         }
