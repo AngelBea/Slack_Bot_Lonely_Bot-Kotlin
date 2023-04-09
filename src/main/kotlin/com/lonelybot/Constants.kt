@@ -17,6 +17,7 @@ const val USER_INFO_URL = "https://slack.com/api/users.info"
 const val BOT_INFO_URL = "https://slack.com/api/bots.info"
 const val OPEN_MODAL_URL = "https://slack.com/api/views.open"
 const val UPDATE_VIEW_URL = "https://slack.com/api/views.update"
+const val KICK_USER_URL = "https://slack.com/api/conversations.kick"
 
 /*
 * Headers

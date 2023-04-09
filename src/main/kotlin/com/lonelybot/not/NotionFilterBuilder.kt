@@ -8,8 +8,25 @@ class NotionFilterBuilder {
             return NotionFilterBuilder().apply(builder)
         }
     }
+    
+    fun and(builder: NotionFilterBuilder.() -> Unit){
+        val filter = NotionFilter{
+            and(builder)
+        }
+        
+        val andMap = mutableMapOf<String, Any>(filter.retrieve().keys.toList()[0] to filter.retrieve().values.toList()[0])
+        filters.add(andMap)
+    }
 
+    fun or(builder: NotionFilterBuilder.() -> Unit){
+        val filter = NotionFilter{
+            or(builder)
+        }
 
+        val orMap = mutableMapOf<String, Any>(filter.retrieve().keys.toList()[0] to filter.retrieve().values.toList()[0])
+        filters.add(orMap)
+    }
+    
     fun contains(field: String, type: NotionTypes, typeConditon: Any): NotionFilterBuilder{
         filters.add(
             mutableMapOf(

@@ -26,8 +26,7 @@ object NotionApp {
         }
 
         object post {
-            suspend fun queryDatabase(notionFilterBuilder: NotionFilterBuilder, notionLogicalFilter: NotionLogicalFilter?, databaseId: String): HttpResponse{
-                val filter = NotionFilter(notionLogicalFilter, notionFilterBuilder)
+            suspend fun queryDatabase(notionFilter: NotionFilter, databaseId: String): HttpResponse{                
                 return client.request {
                     headers {
                         append(HEADER_AUTH_NAME, "Bearer $NOTION_TOKEN")
@@ -37,7 +36,7 @@ object NotionApp {
 
                     method = HttpMethod.Post
                     url(databaseId.let(ENDPOINT_QUERY))
-                    setBody(Gson().toJson(filter.filterObject)) 
+                    setBody(Gson().toJson(notionFilter)) 
                 }
             }
 

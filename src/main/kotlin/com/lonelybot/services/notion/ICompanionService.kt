@@ -1,5 +1,5 @@
 package com.lonelybot.services.notion
 
-interface CompanionService {
+interface ICompanionService {
     val databaseId : String
 }

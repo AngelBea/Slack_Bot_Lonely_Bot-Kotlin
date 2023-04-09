@@ -4,7 +4,7 @@ import com.lonelybot.Permissions
 import com.lonelybot.not.*
 import com.lonelybot.slack.SlackUserInfo
 
-class SlackUserAdapter(notionSlackUser: SlackUser, userInfo: SlackUserInfo) {
+class SlackUserAdapter(private val notionSlackUser: SlackUser, private val userInfo: SlackUserInfo) {
     val redCardsShown: Int by lazy{
         notionSlackUser.redCardsShown.number
     }
@@ -58,4 +58,6 @@ class SlackUserAdapter(notionSlackUser: SlackUser, userInfo: SlackUserInfo) {
     val notionId by lazy{
         notionSlackUser.id
     }
+    
+    fun divide() = notionSlackUser to userInfo
 }

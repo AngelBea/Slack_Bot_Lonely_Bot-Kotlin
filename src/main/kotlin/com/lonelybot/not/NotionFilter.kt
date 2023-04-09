@@ -6,36 +6,28 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.lonelybot.kObjectToJsonObject
 
-class NotionFilter(val logicalFilter: NotionLogicalFilter?, val notionFilterBuilder:  NotionFilterBuilder) {
-    val filterObject: JsonObject
-
-    init{
-        filterObject = when(logicalFilter){
-            NotionLogicalFilter.OR -> constructJsonObject(logicalFilter, notionFilterBuilder)
-            NotionLogicalFilter.AND -> constructJsonObject(logicalFilter, notionFilterBuilder)
-            null -> throw NotAFilterException()
+class NotionFilter(builder: NotionFilter.() -> Unit) {
+    private lateinit var filter: MutableMap<String, List<MutableMap<String, Any>>>
+    
+    init {
+        this.apply(builder)
+    }
+    
+    fun and(builder: NotionFilterBuilder.() -> Unit){
+        if (!this::filter.isInitialized){
+            filter = mutableMapOf()
+            filter[NotionLogicalFilter.AND.jsonValue] = NotionFilterBuilder().apply(builder).filters    
+        }        
+    }
+    
+    fun or(builder: NotionFilterBuilder.() -> Unit){
+        if (!this::filter.isInitialized){
+            filter = mutableMapOf()            
+            filter[NotionLogicalFilter.OR.jsonValue] = NotionFilterBuilder().apply(builder).filters
         }
     }
-
-    private fun constructJsonObject(logicalFilter: NotionLogicalFilter, notionFilterBuilder: NotionFilterBuilder): JsonObject{
-        val rootObj = JsonObject()
-        val filterObj = JsonObject()
-        val orArray = JsonArray()
-        println("Filters ${notionFilterBuilder.filters}")
-
-        notionFilterBuilder.filters.forEach { map ->
-            val propertyObject = JsonObject()
-            propertyObject.addProperty(NotionFields.PROPERTY.name.lowercase(), map[NotionFields.PROPERTY.name.lowercase()] as String)
-            map.remove(NotionFields.PROPERTY.name.lowercase())
-
-            var condition = map.firstNotNullOf { entry -> entry }
-            propertyObject.add(condition.key, kObjectToJsonObject(condition.value))
-            orArray.add(propertyObject)
-        }
-
-        filterObj.add(logicalFilter.jsonValue, orArray)
-        rootObj.add(NotionFields.FILTER.name.lowercase(), filterObj)
-
-        return rootObj
+    
+    fun retrieve(): Map<String, List<MutableMap<String, Any>>>{
+        return filter.toMap()
     }
 }

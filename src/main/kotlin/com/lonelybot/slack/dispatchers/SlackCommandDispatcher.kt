@@ -10,6 +10,7 @@ import com.lonelybot.services.notion.BadUserException
 import com.lonelybot.services.notion.getCurrentUser
 import com.lonelybot.services.notion.isPermitted
 import com.lonelybot.services.notion.updateCardStatsForUsers
+import com.lonelybot.services.slack.SlackChannelService
 import com.lonelybot.services.slack.SlackUserService
 import com.lonelybot.slack.*
 import com.lonelybot.slack.builders.SlackBlockBuilder
@@ -94,14 +95,15 @@ suspend fun processCardService(card: Card) {
         return
     }
     
-    val notionFilter = NotionFilterBuilder.build {
-        this.contains("Tags", NotionTypes.MULTI_SELECT, "Tarjeta")
-        this.contains("Tags", NotionTypes.MULTI_SELECT, card.color.tagName)
+    val notionFilter = NotionFilter{
+        and {
+            contains("Tags", NotionTypes.MULTI_SELECT, "Tarjeta")
+            contains("Tags", NotionTypes.MULTI_SELECT, card.color.tagName)
+        }
     }
 
     val response = NotionApp.request.post.queryDatabase(
         notionFilter,
-        NotionLogicalFilter.AND,
         MEME_TABLE_ID
     ).bodyAsChannel().readUTF8Line()
 
@@ -123,6 +125,7 @@ suspend fun processCardService(card: Card) {
     
     SlackApp.request.post.sendBlockedMessage(card.onChannel, builder)
     updateCardStatsForUsers(fromUser, card.color.tagName, toUser)
+    if (card.color.tagName == NotionTags.RED_COLOUR.tagName) SlackChannelService.kickUser(fromUser, toUser, card.onChannel, true)
 }
 
 private suspend fun processGetTimeRemaining(parameters: Params){
