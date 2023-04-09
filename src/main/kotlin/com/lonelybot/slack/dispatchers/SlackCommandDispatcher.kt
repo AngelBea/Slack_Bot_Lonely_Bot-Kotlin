@@ -95,14 +95,15 @@ suspend fun processCardService(card: Card) {
         return
     }
     
-    val notionFilter = NotionFilterBuilder.build {
-        this.contains("Tags", NotionTypes.MULTI_SELECT, "Tarjeta")
-        this.contains("Tags", NotionTypes.MULTI_SELECT, card.color.tagName)
+    val notionFilter = NotionFilter{
+        and {
+            contains("Tags", NotionTypes.MULTI_SELECT, "Tarjeta")
+            contains("Tags", NotionTypes.MULTI_SELECT, card.color.tagName)
+        }
     }
 
     val response = NotionApp.request.post.queryDatabase(
         notionFilter,
-        NotionLogicalFilter.AND,
         MEME_TABLE_ID
     ).bodyAsChannel().readUTF8Line()
 

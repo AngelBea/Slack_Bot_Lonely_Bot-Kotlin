@@ -9,20 +9,40 @@ import io.ktor.client.statement.*
 import io.ktor.utils.io.*
 
 class NotionSlackUserService{
-    companion object: CompanionService {
+    companion object: ICompanionService {
         override val databaseId: String = "97ca326680654d728548700af7418a72"
 
         suspend fun getUserBySlackIdAndTeamId(slackId: String, teamId: String): List<SlackUser> {
-            val filter = NotionFilterBuilder.build {
-                equals("SlackId", NotionTypes.TITLE, slackId)
-                equals("SlackTeam", NotionTypes.TITLE, teamId)
+            val filter = NotionFilter{
+                and {
+                    equals("SlackId", NotionTypes.TITLE, slackId)
+                    equals("SlackTeam", NotionTypes.TITLE, teamId)
+                }
             }
-
+            
             val responseBody =
-                NotionApp.request.post.queryDatabase(filter, NotionLogicalFilter.AND, databaseId).bodyAsChannel()
+                NotionApp.request.post.queryDatabase(filter, databaseId).bodyAsChannel()
                     .readUTF8Line()
-            responseBody.let(::println)
+            
             return NotionObjectParser(Gson().fromJson(responseBody!!, JsonObject::class.java), SlackUser::class)
+                .parseQueryObject()
+        }
+        
+        suspend fun getUsersById(teamId: String, slackIds: Set<String>): List<SlackUser>{
+            val filter = NotionFilter{
+                and {
+                    or {
+                        slackIds.forEach {
+                            equals("SlackId", NotionTypes.TITLE, it)
+                        }
+                    }
+                    equals("SlackTeam", NotionTypes.TITLE, teamId)
+                }
+            }
+            
+            val response = NotionApp.request.post.queryDatabase(filter, databaseId).bodyAsChannel()
+                .readUTF8Line()
+            return NotionObjectParser(Gson().fromJson(response!!, JsonObject::class.java), SlackUser::class)
                 .parseQueryObject()
         }
         

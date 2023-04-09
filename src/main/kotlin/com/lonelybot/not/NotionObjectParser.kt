@@ -13,8 +13,6 @@ class NotionObjectParser<T: NotionDatatable>(val obj: JsonObject? = null, val no
         val membersProps = notionClass.memberProperties.map { 
             it.name to it.findAnnotation<NotionField>()?.fieldValue}
         
-        println("TRACE | parseQueryObject | classParameters $membersProps")
-        
         obj!!.get("results").asJsonArray.forEach { page ->
             val mapProperties = mutableMapOf<String, Any>()
             
@@ -23,8 +21,7 @@ class NotionObjectParser<T: NotionDatatable>(val obj: JsonObject? = null, val no
             
             val property = pageJsonObj.get("properties").asJsonObject
             
-            membersProps.forEach { classParameter ->
-                "Processing parameter: ${classParameter.first}-${classParameter.second ?: ""}".let(::println)
+            membersProps.forEach { classParameter ->                
                 try{
                     if (classParameter.second == null){
                         mapProperties[classParameter.first] = property.get(classParameter.first)

@@ -9,60 +9,77 @@ import com.lonelybot.not.NotionPageBuilder
 import com.lonelybot.not.SlackUser
 import com.lonelybot.services.slack.SlackChannelService
 import com.lonelybot.services.slack.SlackUserService
-import com.lonelybot.slack.Params
-import com.lonelybot.slack.SlackAction
-import com.lonelybot.slack.SlackApp
-import com.lonelybot.slack.SlackEvent
+import com.lonelybot.singletons.UserSingleton
+import com.lonelybot.slack.*
 
 suspend fun getCurrentUser(parameters: Params, message: Boolean = true): SlackUserAdapter {
-    var slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(parameters.user_id, parameters.team_id)
+    val userId = parameters.user_id
+    if(UserSingleton.isPresent(userId)) return UserSingleton.getByKey(userId)!!
+    
+    var slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(userId, parameters.team_id)
     if(slackUsers.isEmpty()) {
-        val channel = SlackChannelService.openConversationByUser(parameters.user_id, true)
-        NotionSlackUserService.createUser(parameters.user_id, parameters.team_id, parameters.user_name, channel.id)
+        val channel = SlackChannelService.openConversationByUser(userId, true)
+        NotionSlackUserService.createUser(userId, parameters.team_id, parameters.user_name, channel.id)
         if (message){
-            SlackApp.request.post.sendHiddenMessage(channel.id, YOU_WERE_NOT_REGISTERED, parameters.user_id)            
+            SlackApp.request.post.sendHiddenMessage(channel.id, YOU_WERE_NOT_REGISTERED, userId)            
         }
-        slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(parameters.user_id, parameters.team_id)
+        slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(userId, parameters.team_id)
     }
     
-    val slackUserInfo = SlackUserService.getUserById(parameters.user_id)
+    val slackUserInfo = SlackUserService.getUserById(userId)
+    val userAdapter = SlackUserAdapter(slackUsers[0], slackUserInfo)
+    UserSingleton.add(userAdapter)
     
-    return SlackUserAdapter(slackUsers[0], slackUserInfo)
+    return userAdapter
 }
 
 suspend fun getCurrentUser(event: SlackEvent, message: Boolean = true): SlackUserAdapter {
-    var slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(event.event.user, event.teamId)
-    val slackUserInfo = SlackUserService.getUserById(event.event.user)
+    val userId = event.event.user
+    if(UserSingleton.isPresent(userId)) return UserSingleton.getByKey(userId)!!
+    
+    var slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(userId, event.teamId)
+    val slackUserInfo = SlackUserService.getUserById(userId)
     
     if(slackUsers.isEmpty()) {
-        val channel = SlackChannelService.openConversationByUser(event.event.user, true)
-        NotionSlackUserService.createUser(event.event.user, event.teamId, slackUserInfo.name , channel.id)
+        val channel = SlackChannelService.openConversationByUser(userId, true)
+        NotionSlackUserService.createUser(userId, event.teamId, slackUserInfo.name , channel.id)
         if (message){
-            SlackApp.request.post.sendHiddenMessage(channel.id, YOU_WERE_NOT_REGISTERED, event.event.user)            
+            SlackApp.request.post.sendHiddenMessage(channel.id, YOU_WERE_NOT_REGISTERED, userId)            
         }
-        slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(event.event.user, event.teamId)
+        slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(userId, event.teamId)
     }
     
-    return SlackUserAdapter(slackUsers[0], slackUserInfo)
+    val userAdapter = SlackUserAdapter(slackUsers[0], slackUserInfo)
+    UserSingleton.add(userAdapter)
+    
+    return userAdapter
 }
 
 suspend fun getCurrentUser(action: SlackAction, message: Boolean = true): SlackUserAdapter {
-    var slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(action.user!!.id, action.team!!.id)
+    val userId = action.user!!.id 
+    if(UserSingleton.isPresent(userId)) return UserSingleton.getByKey(userId)!!
+    
+    var slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(userId, action.team!!.id)
     if(slackUsers.isEmpty()) {
-        val channel = SlackChannelService.openConversationByUser(action.user.id, true)
-        NotionSlackUserService.createUser(action.user.id, action.team.id, action.user.username , channel.id)
+        val channel = SlackChannelService.openConversationByUser(userId, true)
+        NotionSlackUserService.createUser(userId, action.team.id, action.user.username , channel.id)
         if (message){
             SlackApp.request.post.sendHiddenMessage(channel.id, YOU_WERE_NOT_REGISTERED, action.user.id)            
         }
-        slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(action.user.id, action.team.id)
+        slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(userId, action.team.id)
     }
     
-    val slackUserInfo = SlackUserService.getUserById(action.user.id)
-
-    return SlackUserAdapter(slackUsers[0], slackUserInfo)
+    val slackUserInfo = SlackUserService.getUserById(userId)
+    
+    val userAdapter = SlackUserAdapter(slackUsers[0], slackUserInfo)    
+    UserSingleton.add(userAdapter)
+    
+    return userAdapter 
 }
 
 suspend fun getCurrentUser(slackId: String, slackTeam: String, message: Boolean = true): SlackUserAdapter{
+    if(UserSingleton.isPresent(slackId)) return UserSingleton.getByKey(slackId)!!
+        
     var slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(slackId, slackTeam)
     val slackUserInfo = SlackUserService.getUserById(slackId)
     
@@ -77,7 +94,10 @@ suspend fun getCurrentUser(slackId: String, slackTeam: String, message: Boolean 
         slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(slackId, slackTeam)
     }
 
-    return SlackUserAdapter(slackUsers[0], slackUserInfo)
+    val userAdapter = SlackUserAdapter(slackUsers[0], slackUserInfo)
+    UserSingleton.add(userAdapter)
+    
+    return userAdapter
 }
 
 suspend fun updateCardStatsForUsers(fromUser: SlackUserAdapter, cardName: String, toUser: SlackUserAdapter){
@@ -107,6 +127,8 @@ suspend fun updateCardStatsForUsers(fromUser: SlackUserAdapter, cardName: String
             NotionApp.request.post.updatePage(toUser.notionId!!, builderToUser)
         }
     }
+    
+    UserSingleton.refresh(fromUser.slackId, toUser.slackId)
 }
 
 fun SlackUserAdapter.isPermitted(permission: Permissions): Boolean = this.permissions.none { it == permission }.not()
