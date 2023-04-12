@@ -1,9 +1,11 @@
 package com.lonelybot.slack.dispatchers
 
 import com.google.gson.Gson
+import com.jayway.jsonpath.PathNotFoundException
 import com.lonelybot.*
 import com.lonelybot.notion.NotionApp
 import com.lonelybot.notion.builders.NotionPageBuilder
+import com.lonelybot.services.global.createRedCard
 import com.lonelybot.services.global.createYellowCard
 import com.lonelybot.services.notion.BadUserException
 import com.lonelybot.services.global.getCurrentUser
@@ -140,14 +142,31 @@ suspend fun SlackViewSubmission.redCard(){
 suspend fun SlackBlockAction.uploadCard(){
     ViewFactory.buildLoadingModal(UPLOAD_MODAL_ID, triggerId!!).deploy()
     val currentUser = getCurrentUser(this)
-    
-    val url = getStateOf<String>(VIEW_INPUT_URL_BLOCK_ID, VIEW_INPUT_CARD_URL_ID, "value")
-    val cardType = getStateOf<String>(VIEW_INPUT_OPTION_CARD_URL_ID, VIEW_INPUT_OPTION_CARD_SELECTED_URL_ID, "selected_option", "value")
-    val meme = when(cardType){
-        "Amarilla" -> createYellowCard(url, currentUser)
-        else -> createYellowCard(url, currentUser)
+    var url : String? = null 
+    var cardType: String? = null
+    try{
+        url = getStateOf<String>(VIEW_INPUT_URL_BLOCK_ID, VIEW_INPUT_CARD_URL_ID, "value")
+        cardType = getStateOf<String>(VIEW_INPUT_OPTION_CARD_URL_ID, VIEW_INPUT_OPTION_CARD_SELECTED_URL_ID, "selected_option", "value")        
+    }catch (exc: PathNotFoundException){
+        
     }
     
+    url ?: ViewFactory
+        .buildLoadingModalError(UPLOAD_MODAL_ID, triggerId!!, "Debes rellenar la URL para subir.")
+        .update(UPLOAD_MODAL_ID)
+    url ?: return
+    
+    val meme = when(cardType){
+        "Amarilla" -> createYellowCard(url!!, currentUser)
+        "Roja" -> createRedCard(url!!, currentUser)
+        else -> {
+            ViewFactory
+                .buildLoadingModalError(UPLOAD_MODAL_ID, triggerId!!, "Debes seleccionar un valor valido Roja o Amarilla")
+                .update(UPLOAD_MODAL_ID)
+            null   
+        }
+    } ?: return
+
     ViewFactory.buildModalUploadConfirmation(triggerId, meme).update(UPLOAD_MODAL_ID)
 }
 

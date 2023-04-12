@@ -13,3 +13,11 @@ suspend fun createYellowCard(url: String, createdUser: SlackUserAdapter): MemeDe
     
     return notionMemeCreated
 }
+
+suspend fun createRedCard(url: String, createdUser: SlackUserAdapter): MemeDecorator{
+    val album = "Vio3f4U"
+    val imageCreated = ImageService.createImage(url, album, ImageType.URL)
+    val notionMemeCreated = MemeService.createMeme(createdUser.notionId!!, "red_${imageCreated.id}", "Slack", imageCreated.link, "Tarjeta", "Roja", "Red", "Card")
+
+    return notionMemeCreated
+}
