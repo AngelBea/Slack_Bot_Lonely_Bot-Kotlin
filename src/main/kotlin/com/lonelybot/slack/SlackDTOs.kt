@@ -3,7 +3,6 @@ package com.lonelybot.slack
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import com.lonelybot.NotionTags
-import java.io.Serial
 
 data class Params(val token: String, val team_id: String, val team_domain: String, val channel_id: String,
                   val channel_name: String, val user_id: String, val user_name: String, val command: String, val text: String,
@@ -29,7 +28,7 @@ data class SlackMarkdown(val text: String) : Element(ElementType.MARKDOWN.typeNa
 data class SlackUserSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String, @SerializedName("initial_user") val initialUser: String?): Element(ElementType.USERS_SELECT.typeName), SlackAccessory
 data class SlackMultiConversationSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String): Element(ElementType.MULTI_CONVERSATIONS_SELECT.typeName), SlackAccessory
 data class SlackConversationSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String, @SerializedName("initial_conversation") val initialConversation: String? = null): Element(ElementType.CONVERSATIONS_SELECT.typeName), SlackAccessory
-data class SlackStaticSelect(val placeholder: SlackText, val options: MutableList<SlackOption>): Element(ElementType.STATIC_SELECT.typeName), SlackAccessory
+data class SlackStaticSelect(val placeholder: SlackText, val options: MutableList<SlackOption>, @SerializedName("action_id") val actionId: String): Element(ElementType.STATIC_SELECT.typeName), SlackAccessory
 data class SlackImage(@SerializedName("image_url")val imageUrl: String, @SerializedName("alt_text") val altText: String): Element(ElementType.IMAGE.typeName), SlackAccessory
 data class SlackButton(val text: SlackText, val value: String, @SerializedName("action_id") val actionId: String): Element(ElementType.BUTTON.typeName), SlackAccessory
 data class SlackOverflow(@SerializedName("action_id") val actionId: String, val options: MutableList<SlackOption>): Element(ElementType.OVERFLOW.typeName), SlackAccessory
@@ -53,8 +52,6 @@ open class SlackAction(val type: String?, val team: Team?, val user: User?, val 
                               @SerializedName("response_url") val responseUrl: String?, @SerializedName("trigger_id") val triggerId: String?)
 data class SlackMessageAction(val message: Message): SlackAction(null, null, null, null, null, null, null)
 data class SlackValues(val values: JsonObject)
-
-
 
 data class Team(val id: String, val domain: String)
 

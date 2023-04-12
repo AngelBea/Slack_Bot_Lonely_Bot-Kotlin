@@ -1,10 +1,6 @@
-package com.lonelybot.not
+package com.lonelybot.notion.builders
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import com.lonelybot.kObjectToJsonObject
+import com.lonelybot.notion.NotionLogicalFilter
 
 class NotionFilter(builder: NotionFilter.() -> Unit) {
     private lateinit var filter: MutableMap<String, List<MutableMap<String, Any>>>

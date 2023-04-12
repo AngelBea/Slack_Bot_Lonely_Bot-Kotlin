@@ -160,6 +160,7 @@ object SlackApp{
                     setBody(Gson().toJson(map))
                 }
             }
+            
             suspend fun getUserInfo(userId: String): HttpResponse{
                 return client.request{
                     headers {

@@ -1,8 +1,11 @@
-package com.lonelybot.not
+package com.lonelybot.notion
+
+import com.lonelybot.NotionTags
 
 open class NotionDatatable(var id: String? = null)
 data class Meme(@NotionField("Name") val name: NotionTitle, @NotionField("Url") val url: NotionRichText, 
-                @NotionField("Source")val source: NotionSelect,  @NotionField("Date") val date: NotionDate):
+                @NotionField("Source") val source: NotionSelect, @NotionField("Tags") val tags: NotionMultiSelect, 
+                @NotionField("Added By") val addedBy: NotionRelation?):
     NotionDatatable()
 data class SlackUser(@NotionField("SlackId") val slackId: NotionRichText, 
                      @NotionField("SlackTeam") val slackTeam: NotionRichText,

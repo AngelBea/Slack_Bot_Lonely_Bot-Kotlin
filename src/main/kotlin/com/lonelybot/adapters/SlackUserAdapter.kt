@@ -1,7 +1,7 @@
 package com.lonelybot.adapters
 
 import com.lonelybot.Permissions
-import com.lonelybot.not.*
+import com.lonelybot.notion.*
 import com.lonelybot.slack.SlackUserInfo
 
 class SlackUserAdapter(private val notionSlackUser: SlackUser, private val userInfo: SlackUserInfo) {

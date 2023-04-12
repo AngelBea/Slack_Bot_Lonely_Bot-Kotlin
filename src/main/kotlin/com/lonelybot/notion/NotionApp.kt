@@ -1,7 +1,9 @@
-package com.lonelybot.not
+package com.lonelybot.notion
 
 import com.google.gson.Gson
 import com.lonelybot.*
+import com.lonelybot.notion.builders.NotionFilter
+import com.lonelybot.notion.builders.NotionPageBuilder
 import io.ktor.client.*
 import io.ktor.client.plugins.observer.*
 import io.ktor.client.request.*

@@ -1,4 +1,4 @@
-package com.lonelybot.not
+package com.lonelybot.notion
 
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
@@ -12,6 +12,7 @@ data class NotionSelect(val select: NotionSelectObject): NotionParameter()
 data class NotionMultiSelect(@SerializedName("multi_select") val multiSelect: MutableList<MultiSelectObject>) : NotionParameter()
 data class NotionNumber(val number: Int): NotionParameter()
 data class NotionParent(@SerializedName("database_id") val databaseId: String, val type: String = "database_id")
+data class NotionRelation(val relation: List<NotionRelationObject>) : NotionParameter()
 
 
 open class RichTextType(val type: String, val annotations: NotionAnnotationsObject?, val href: String?, @SerializedName("plain_text") val plainText: String?)
@@ -22,8 +23,9 @@ data class NotionEquationObject(val equation: NotionExpressionObject, private va
 data class MultiSelectObject(val name: String)
 data class NotionContentObject(val content: String, val link: NotionLinkObject?)
 data class NotionAnnotationsObject(val bold: Boolean, val italic: Boolean, val strikethrough: Boolean, val underline: Boolean, val code: Boolean, val color: String)
-data class NotionDateObject(val start: LocalDateTime, val end: LocalDateTime? = null, @SerializedName("time_zone") val timeZone: String? = null)
+data class NotionDateObject(val start: String, val end: String? = null, @SerializedName("time_zone") val timeZone: String? = null)
 data class NotionExpressionObject(val expression: String)
+data class NotionRelationObject(val id: String)
 
 
 data class NotionSelectObject(val name: String)

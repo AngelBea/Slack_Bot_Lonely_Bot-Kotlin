@@ -4,14 +4,14 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.lonelybot.*
 import com.lonelybot.adapters.SlackUserAdapter
-import com.lonelybot.not.*
-import com.lonelybot.not.Meme
+import com.lonelybot.notion.*
+import com.lonelybot.notion.Meme
+import com.lonelybot.notion.builders.NotionFilter
 import com.lonelybot.services.notion.BadUserException
-import com.lonelybot.services.notion.getCurrentUser
-import com.lonelybot.services.notion.isPermitted
-import com.lonelybot.services.notion.updateCardStatsForUsers
+import com.lonelybot.services.global.getCurrentUser
+import com.lonelybot.services.global.isPermitted
+import com.lonelybot.services.global.updateCardStatsForUsers
 import com.lonelybot.services.slack.SlackChannelService
-import com.lonelybot.services.slack.SlackUserService
 import com.lonelybot.slack.*
 import com.lonelybot.slack.builders.SlackBlockBuilder
 import io.ktor.client.statement.*
@@ -107,8 +107,8 @@ suspend fun processCardService(card: Card) {
         MEME_TABLE_ID
     ).bodyAsChannel().readUTF8Line()
 
-    val cardMemes = NotionObjectParser(Gson().fromJson(response, JsonObject::class.java), Meme::class)
-        .parseQueryObject<Meme>()
+    val cardMemes = NotionObjectParser(Meme::class, Gson().fromJson(response, JsonObject::class.java))
+        .parseQuery<Meme>()
         .shuffled(Random(System.currentTimeMillis()))
 
     val builder = SlackBlockBuilder{
@@ -116,7 +116,7 @@ suspend fun processCardService(card: Card) {
             addMarkdownText("<@${card.fromUser}> ha sacado ${card.color.emote} a <@${card.toUser}> por ${card.reason ?: "los loles"}")
         }
         addImage(
-            cardMemes.first().url.richText.first().href ?: ""
+            cardMemes.first().url.richText.first().plainText ?: ""
             , cardMemes.first().name.title.first().plainText ?: ""
             , "${card.color.tagName} de <@${fromUser.slackUserName}>"
         )
@@ -233,12 +233,22 @@ suspend fun processLonelyMe(parameters: Params){
         addImage("https://i.imgur.com/UyAXgQj.png", "Banner Lonely Me")
         addImageSection("Te identifico como el esbirro <@${currentUser.slackId}>", currentUser.profileImgFull, currentUser.slackUserName)
         addDivider()
-        addTextSection(":large_yellow_square::arrow_forward: Te han castigado con ${currentUser.yellowCardsReceived} amarillas.")
-        addTextSection(":large_yellow_square::arrow_backward: Has castigado con ${currentUser.yellowCardsShown} amarillas")
-        addTextSection(":large_red_square::arrow_forward: Has expulsado a alguien ${currentUser.redCardsShown} veces")
-        addTextSection(":large_red_square::arrow_backward: Te han expulsado ${currentUser.redCardsReceived} veces")
-        addTextSection(":calendar: Empiezas a holgazanear a las ${currentUser.leavingOnFriday} el Viernes")
-        addTextSection(":calendar: Entre semana a las ${currentUser.leavingRestOfWeek}")
+        if (!currentUser.isPermitted(Permissions.CARDS)){
+            addTextSection(":large_yellow_square::arrow_forward: Te han castigado con ${currentUser.yellowCardsReceived} amarillas.")
+            addTextSection(":large_yellow_square::arrow_backward: Has castigado con ${currentUser.yellowCardsShown} amarillas")
+            addTextSection(":large_red_square::arrow_forward: Has expulsado a alguien ${currentUser.redCardsShown} veces")
+            addTextSection(":large_red_square::arrow_backward: Te han expulsado ${currentUser.redCardsReceived} veces")            
+        }else{
+            addTextSection(":large_yellow_square::large_red_square:No tengo información de expulsiones/castigos de tarjetas, puede ser porque no tengas permisos.")
+        }
+        
+        if (!currentUser.isPermitted(Permissions.TIMEREMAINING) && currentUser.leavingOnFriday != null && currentUser.leavingRestOfWeek != null){ 
+            addTextSection(":calendar: Empiezas a holgazanear a las ${currentUser.leavingOnFriday} el Viernes")
+            addTextSection(":calendar: Entre semana a las ${currentUser.leavingRestOfWeek}")
+        }else{
+            addTextSection(":calendar: No tengo información de cuando sales, no podrás usar **/lonelyrun** si no me lo dices.")
+        }
+        
     }
     
     SlackApp.request.post.sendBlockedMessage(parameters.channel_id, messageBlock)    

@@ -1,7 +1,9 @@
-package com.lonelybot.not
+package com.lonelybot.notion.builders
 
 import com.google.gson.Gson
+import com.lonelybot.notion.*
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class NotionPageBuilder(databaseId: String? = null) {
     private val parent = if (databaseId != null) NotionParent(databaseId) else null
@@ -10,7 +12,7 @@ class NotionPageBuilder(databaseId: String? = null) {
     val children: MutableList<Any> = mutableListOf()
     
     companion object{
-        inline fun build (databaseId: String? = null, builder: NotionPageBuilder.() -> Unit): NotionPageBuilder{
+        inline fun build (databaseId: String? = null, builder: NotionPageBuilder.() -> Unit): NotionPageBuilder {
             return NotionPageBuilder(databaseId).apply(builder)
         }
     }
@@ -73,13 +75,21 @@ class NotionPageBuilder(databaseId: String? = null) {
     }
     
     fun addDate(field: String, start: LocalDateTime, end: LocalDateTime? = null, timeZone: String? = null){
-        val dateObj = NotionDateObject(start, end, timeZone)
+        val dateObj = NotionDateObject(start.format(DateTimeFormatter.ISO_DATE_TIME), end?.format(DateTimeFormatter.ISO_DATE_TIME), timeZone)
         properties[field] = NotionDate(dateObj)
+    }
+    
+    fun addRelation(field: String, pageId: String){
+        val relationObject = NotionRelationObject(pageId)
+        val relation = NotionRelation(listOf(relationObject))
+        
+        properties[field] = relation
     }
     
     fun addProperty(field: String, property: NotionParameter){
         properties[field] = property
     }
+    
     
     fun toJson(): String{
         return Gson().toJson(this)

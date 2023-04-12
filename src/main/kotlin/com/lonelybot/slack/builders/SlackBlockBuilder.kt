@@ -84,11 +84,11 @@ class SlackBlockBuilder(builder: SlackBlockBuilder.() -> Unit) {
         return this
     }    
     
-    fun addStaticSelectSection(text: String, placeholder: String, isTextMarkdown: Boolean = true, vararg options: String): SlackBlockBuilder {
+    fun addStaticSelectSection(text: String, placeholder: String, actionId: String, vararg options: String , isTextMarkdown: Boolean = true): SlackBlockBuilder {
         val optionList = options.map {            
             SlackOption(SlackText(it), it)
         }.toMutableList()
-        val staticSelect = SlackStaticSelect(SlackText(placeholder), optionList)
+        val staticSelect = SlackStaticSelect(SlackText(placeholder), optionList, actionId)
         
         val accessorySection = SlackAccessorySection(checkMarkdownText(text, isTextMarkdown), staticSelect)
         blocks.add(accessorySection)
@@ -96,11 +96,11 @@ class SlackBlockBuilder(builder: SlackBlockBuilder.() -> Unit) {
         return this
     }
 
-    fun addStaticSelectSection(text: String, placeholder: String, isTextMarkdown: Boolean = true, vararg optionsWithValue: Pair<String, String>): SlackBlockBuilder {
+    fun addStaticSelectSection(text: String, placeholder: String, actionId: String, vararg optionsWithValue: Pair<String, String>, isTextMarkdown: Boolean = true): SlackBlockBuilder {
         val optionList = optionsWithValue.map {
             SlackOption(SlackText(it.first), it.second)
         }.toMutableList()
-        val staticSelect = SlackStaticSelect(SlackText(placeholder), optionList)
+        val staticSelect = SlackStaticSelect(SlackText(placeholder), optionList, actionId)
 
         val accessorySection = SlackAccessorySection(checkMarkdownText(text, isTextMarkdown), staticSelect)
         blocks.add(accessorySection)
