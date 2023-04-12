@@ -1,12 +1,13 @@
-package com.lonelybot.services.notion
+package com.lonelybot.services.global
 
 import com.lonelybot.NotionTags
 import com.lonelybot.Permissions
 import com.lonelybot.YOU_WERE_NOT_REGISTERED
 import com.lonelybot.adapters.SlackUserAdapter
-import com.lonelybot.not.NotionApp
-import com.lonelybot.not.NotionPageBuilder
-import com.lonelybot.not.SlackUser
+import com.lonelybot.notion.NotionApp
+import com.lonelybot.notion.builders.NotionPageBuilder
+import com.lonelybot.services.notion.BadUserException
+import com.lonelybot.services.notion.NotionSlackUserService
 import com.lonelybot.services.slack.SlackChannelService
 import com.lonelybot.services.slack.SlackUserService
 import com.lonelybot.singletons.UserSingleton
@@ -42,7 +43,7 @@ suspend fun getCurrentUser(event: SlackEvent, message: Boolean = true): SlackUse
     
     if(slackUsers.isEmpty()) {
         val channel = SlackChannelService.openConversationByUser(userId, true)
-        NotionSlackUserService.createUser(userId, event.teamId, slackUserInfo.name , channel.id)
+        NotionSlackUserService.createUser(userId, event.teamId, slackUserInfo.name, channel.id)
         if (message){
             SlackApp.request.post.sendHiddenMessage(channel.id, YOU_WERE_NOT_REGISTERED, userId)            
         }
@@ -62,7 +63,7 @@ suspend fun getCurrentUser(action: SlackAction, message: Boolean = true): SlackU
     var slackUsers = NotionSlackUserService.getUserBySlackIdAndTeamId(userId, action.team!!.id)
     if(slackUsers.isEmpty()) {
         val channel = SlackChannelService.openConversationByUser(userId, true)
-        NotionSlackUserService.createUser(userId, action.team.id, action.user.username , channel.id)
+        NotionSlackUserService.createUser(userId, action.team.id, action.user.username, channel.id)
         if (message){
             SlackApp.request.post.sendHiddenMessage(channel.id, YOU_WERE_NOT_REGISTERED, action.user.id)            
         }

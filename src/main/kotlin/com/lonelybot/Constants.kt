@@ -18,6 +18,8 @@ const val BOT_INFO_URL = "https://slack.com/api/bots.info"
 const val OPEN_MODAL_URL = "https://slack.com/api/views.open"
 const val UPDATE_VIEW_URL = "https://slack.com/api/views.update"
 const val KICK_USER_URL = "https://slack.com/api/conversations.kick"
+const val IMGUR_CREATE_IMG_URL = "https://api.imgur.com/3/image"
+const val IMGUR_TOKEN_URL = "https://api.imgur.com/oauth2/token"
 
 /*
 * Headers
@@ -35,6 +37,9 @@ val BOT_TOKEN_PROD: String = System.getenv("SLACK_BOT_TOKEN")
 val BOT_TOKEN_TEST: String = System.getenv("SLACK_BOT_TOKEN_TEST")
 val BOT_TOKEN: String = if (TEST_MODE) BOT_TOKEN_TEST else BOT_TOKEN_PROD
 val NOTION_TOKEN: String = System.getenv("NOTION_TOKEN")
+val IMGUR_REFRESH_TOKEN: String = System.getenv("IMGUR_REFRESH_TOKEN")
+val IMGUR_CLIENT_ID: String = System.getenv("IMGUR_ID")
+val IMGUR_CLIENT_SECRET: String = System.getenv("IMGUR_SECRET")
 
 /*
 * Lists
@@ -98,6 +103,12 @@ val VIEW_HOME_PLACEHOLDER_TIMEPICKER = "Pon la hora."
 val VIEW_HOME_SECTION_FRIDAY_ID = "time-remaining-section-friday"
 val VIEW_HOME_SECTION_WEEK_ID = "time-remaining-section-week"
 val VIEW_HOME_SAVE_BUTTON_ID = "save-time-remaining"
+val VIEW_HOME_SAVE_CARD_BUTTON_ID = "save-card"
+val VIEW_INPUT_CARD_URL_ID = "input-card-url"
+val VIEW_INPUT_URL_BLOCK_ID = "card-url"
+val VIEW_INPUT_OPTION_CARD_URL_ID = "card-url-option"
+val VIEW_INPUT_OPTION_CARD_SELECTED_URL_ID = "card-url-option-selected"
+val VIEW_INPUT_OPTION_MESSAGE = "Pon aquí la URL y selecciona si quieres que sea una tarjeta roja o una amarilla."
 
 /* Yellow Card Modal */
 const val VIEW_MODAL_YELLOW_CARD_TITLE = "¡Tarjeta amarilla!"
@@ -128,3 +139,11 @@ const val VIEW_MODAL_RED_CARD_SUBMIT = "¡Si, expulsale!"
 const val VIEW_MODAL_RED_CARD_ID = "red-card-view"
 const val VIEW_MODAL_RED_CARD_CHANNEL_ACTION_ID = "to-channel"
 const val VIEW_MODAL_RED_CARD_CHANNEL_BLOCK_ID = "red-card-to-channel"
+
+
+/* Upload Image Confirmation Modal */
+
+const val UPLOAD_MODAL_ID = "upload_card_confirmation"
+const val UPLOAD_MODAL_TITLE = "¡Tarjeta subida!"
+const val UPLOAD_MODAL_MSG_IMG = "Esta es tu imagen:"
+const val UPLOAD_MODAL_MSG_URL = "Aqui la puedes ver en Imgur: "

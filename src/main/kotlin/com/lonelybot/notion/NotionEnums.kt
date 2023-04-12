@@ -1,4 +1,4 @@
-package com.lonelybot.not
+package com.lonelybot.notion
 
 enum class NotionLogicalFilter(val jsonValue: String) {
     OR("or"),

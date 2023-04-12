@@ -2,13 +2,13 @@ package com.lonelybot.slack.dispatchers
 
 import com.google.gson.Gson
 import com.lonelybot.*
-import com.lonelybot.adapters.SlackUserAdapter
-import com.lonelybot.not.NotionApp
-import com.lonelybot.not.NotionPageBuilder
+import com.lonelybot.notion.NotionApp
+import com.lonelybot.notion.builders.NotionPageBuilder
+import com.lonelybot.services.global.createYellowCard
 import com.lonelybot.services.notion.BadUserException
-import com.lonelybot.services.notion.getCurrentUser
-import com.lonelybot.services.notion.isPermitted
-import com.lonelybot.services.slack.SlackBotService
+import com.lonelybot.services.global.getCurrentUser
+import com.lonelybot.services.global.isPermitted
+import com.lonelybot.services.notion.MemeService
 import com.lonelybot.slack.*
 import com.lonelybot.slack.factories.ViewFactory
 import io.ktor.http.*
@@ -44,6 +44,7 @@ fun Route.actionReader(){
     
                         when(actionBlock.getActionId()){
                             "save-time-remaining" -> actionBlock.saveLeavingTime()
+                            VIEW_HOME_SAVE_CARD_BUTTON_ID -> actionBlock.uploadCard()
                         }                        
                     }
                     
@@ -135,6 +136,21 @@ suspend fun SlackViewSubmission.redCard(){
 
     processCardService(card)
 }
+
+suspend fun SlackBlockAction.uploadCard(){
+    ViewFactory.buildLoadingModal(UPLOAD_MODAL_ID, triggerId!!).deploy()
+    val currentUser = getCurrentUser(this)
+    
+    val url = getStateOf<String>(VIEW_INPUT_URL_BLOCK_ID, VIEW_INPUT_CARD_URL_ID, "value")
+    val cardType = getStateOf<String>(VIEW_INPUT_OPTION_CARD_URL_ID, VIEW_INPUT_OPTION_CARD_SELECTED_URL_ID, "selected_option", "value")
+    val meme = when(cardType){
+        "Amarilla" -> createYellowCard(url, currentUser)
+        else -> createYellowCard(url, currentUser)
+    }
+    
+    ViewFactory.buildModalUploadConfirmation(triggerId, meme).update(UPLOAD_MODAL_ID)
+}
+
 inline fun <reified T> getActionAs(json: String?) : T{
     return Gson().fromJson(json, T::class.java)
 }

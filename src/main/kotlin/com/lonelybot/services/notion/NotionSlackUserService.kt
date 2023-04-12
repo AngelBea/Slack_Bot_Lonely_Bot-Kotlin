@@ -3,8 +3,10 @@ package com.lonelybot.services.notion
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.lonelybot.Permissions
-import com.lonelybot.not.*
-import com.lonelybot.not.SlackUser
+import com.lonelybot.notion.*
+import com.lonelybot.notion.SlackUser
+import com.lonelybot.notion.builders.NotionFilter
+import com.lonelybot.notion.builders.NotionPageBuilder
 import io.ktor.client.statement.*
 import io.ktor.utils.io.*
 
@@ -24,8 +26,8 @@ class NotionSlackUserService{
                 NotionApp.request.post.queryDatabase(filter, databaseId).bodyAsChannel()
                     .readUTF8Line()
             
-            return NotionObjectParser(Gson().fromJson(responseBody!!, JsonObject::class.java), SlackUser::class)
-                .parseQueryObject()
+            return NotionObjectParser(SlackUser::class, Gson().fromJson(responseBody!!, JsonObject::class.java))
+                .parseQuery()
         }
         
         suspend fun getUsersById(teamId: String, slackIds: Set<String>): List<SlackUser>{
@@ -42,8 +44,8 @@ class NotionSlackUserService{
             
             val response = NotionApp.request.post.queryDatabase(filter, databaseId).bodyAsChannel()
                 .readUTF8Line()
-            return NotionObjectParser(Gson().fromJson(response!!, JsonObject::class.java), SlackUser::class)
-                .parseQueryObject()
+            return NotionObjectParser(SlackUser::class, Gson().fromJson(response!!, JsonObject::class.java))
+                .parseQuery()
         }
         
         suspend fun createUser(slackId: String, slackTeam: String, name: String, imChannel: String){            

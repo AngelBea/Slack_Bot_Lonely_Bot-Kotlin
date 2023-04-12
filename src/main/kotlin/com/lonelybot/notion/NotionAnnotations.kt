@@ -1,4 +1,4 @@
-package com.lonelybot.not
+package com.lonelybot.notion
 
 
 @Retention(AnnotationRetention.RUNTIME)
