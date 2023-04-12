@@ -52,6 +52,18 @@ class ViewFactory {
             } byId externalId
         }
         
+        fun buildLoadingModalError(externalId: String, triggerId: String, msg: String): SlackViewBuilder {
+            return SlackViewBuilder{
+                modal(triggerId){
+                    title("Error")
+                    close("OK!")
+                    blocks { 
+                        addTextSection(msg)
+                    }
+                }
+            } byId externalId
+        }
+        
         fun buildModalYellowCard(fromUser: SlackUserAdapter, toUser: SlackUserAdapter, triggerId: String, channelId: String): SlackViewBuilder{
             return SlackViewBuilder{
                 modal(triggerId){
