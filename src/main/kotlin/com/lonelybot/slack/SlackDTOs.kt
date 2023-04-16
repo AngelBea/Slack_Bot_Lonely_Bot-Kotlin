@@ -12,6 +12,7 @@ data class Message(val channel: String, val text: String, val user: String? = nu
                    val blocks: MutableList<SlackBlock> = mutableListOf())
 
 open class SlackBlock(val type: String, var block_id: String?)
+data class SlackActionBlock(val elements: List<Element>): SlackBlock(BlockType.ACTIONS.typeName, null)
 data class SlackImageBlock(@SerializedName("image_url")val imageUrl: String, @SerializedName("alt_text") val altText: String, val title: SlackText?): SlackBlock(type = BlockType.IMAGE.typeName, block_id = "id_$altText")
 data class SlackTextSectionBlock(val text: SlackTextElement): SlackBlock(BlockType.SECTION.typeName, null)
 data class SlackMultiSection(val fields: List<SlackTextElement>): SlackBlock(BlockType.SECTION.typeName, null)
@@ -23,14 +24,14 @@ data class SlackInput(val element: InputElement, val label: SlackText): SlackBlo
 open class Element(val type: String?)
 interface SlackTextElement
 interface SlackAccessory
-data class SlackText(val text: String) : Element(ElementType.TEXT.typeName), SlackTextElement
+data class SlackText(val text: String, val emoji: Boolean = true) : Element(ElementType.TEXT.typeName), SlackTextElement
 data class SlackMarkdown(val text: String) : Element(ElementType.MARKDOWN.typeName), SlackTextElement
 data class SlackUserSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String, @SerializedName("initial_user") val initialUser: String?): Element(ElementType.USERS_SELECT.typeName), SlackAccessory
 data class SlackMultiConversationSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String): Element(ElementType.MULTI_CONVERSATIONS_SELECT.typeName), SlackAccessory
 data class SlackConversationSelect(val placeholder: SlackText, @SerializedName("action_id") val actionId: String, @SerializedName("initial_conversation") val initialConversation: String? = null): Element(ElementType.CONVERSATIONS_SELECT.typeName), SlackAccessory
 data class SlackStaticSelect(val placeholder: SlackText, val options: MutableList<SlackOption>, @SerializedName("action_id") val actionId: String): Element(ElementType.STATIC_SELECT.typeName), SlackAccessory
 data class SlackImage(@SerializedName("image_url")val imageUrl: String, @SerializedName("alt_text") val altText: String): Element(ElementType.IMAGE.typeName), SlackAccessory
-data class SlackButton(val text: SlackText, val value: String, @SerializedName("action_id") val actionId: String): Element(ElementType.BUTTON.typeName), SlackAccessory
+data class SlackButton(val text: SlackText, val value: String, @SerializedName("action_id") val actionId: String, val style: String?): Element(ElementType.BUTTON.typeName), SlackAccessory
 data class SlackOverflow(@SerializedName("action_id") val actionId: String, val options: MutableList<SlackOption>): Element(ElementType.OVERFLOW.typeName), SlackAccessory
 data class SlackDatePicker(val placeholder: SlackText, @SerializedName("action_id") val actionId: String, @SerializedName("initial_date") val initialDate: String): Element(ElementType.DATE_PICKER.typeName), SlackAccessory
 data class SlackTimePicker(val placeholder: SlackText, @SerializedName("action_id") val actionId: String, @SerializedName("initial_time") val initialTime: String): Element(ElementType.TIMEPICKER.typeName), SlackAccessory

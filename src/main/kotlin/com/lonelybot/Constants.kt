@@ -89,26 +89,33 @@ const val YOU_SHOULD_NOT_BE_HERE = "¿Tu no te habías ido ya o quieres seguir t
 * View Texts
  */
 
-val VIEW_HOME_MESSAGE_MR_LONELY = {user: SlackUserAdapter -> """Hola <@${user.slackId}> me gusta tener a mis esbirros controlados. Dime aquí lo que haces mientras yo no te veo."""}
-val VIEW_HOME_IMAGE_MR_LONELY = "https://i.imgur.com/qAXUaZI.png"
-val VIEW_HOME_ALT_MR_LONELY = "Mr. Lonely"
+val VIEW_HOME_MESSAGE_MR_LONELY = {user: SlackUserAdapter -> """Hola <@${user.slackId}> bienvenido a mi humilde mansión. Aquí podrás acceder a todo lo que necesitas, si te dejo..."""}
+const val VIEW_HOME_IMAGE_MR_LONELY = "https://i.imgur.com/qAXUaZI.png"
+const val VIEW_HOME_ALT_MR_LONELY = "Mr. Lonely"
 
-val VIEW_HOME_DATEPICKER_FRIDAY = "¿A que hora te piensas ir los Viernes?"
-val VIEW_HOME_DATEPICKER_WEEK = "¿A que hora empiezas a hacer el vago entre semana?"
-val VIEW_HOME_ACTIONID_FRIDAY = "time-remaining-pick-friday"
-val VIEW_HOME_ACTIONID_WEEK = "time-remaining-pick-week"
+const val VIEW_HOME_DATEPICKER_FRIDAY = "¿A que hora te piensas ir los Viernes?"
+const val VIEW_HOME_DATEPICKER_WEEK = "¿A que hora empiezas a hacer el vago entre semana?"
+const val VIEW_HOME_ACTIONID_FRIDAY = "time-remaining-pick-friday"
+const val VIEW_HOME_ACTIONID_WEEK = "time-remaining-pick-week"
 val VIEW_HOME_TIME_FRIDAY = Time.valueOf("15:00:00")
 val VIEW_HOME_TIME_WEEK = Time.valueOf("17:30:00")
-val VIEW_HOME_PLACEHOLDER_TIMEPICKER = "Pon la hora."
-val VIEW_HOME_SECTION_FRIDAY_ID = "time-remaining-section-friday"
-val VIEW_HOME_SECTION_WEEK_ID = "time-remaining-section-week"
-val VIEW_HOME_SAVE_BUTTON_ID = "save-time-remaining"
-val VIEW_HOME_SAVE_CARD_BUTTON_ID = "save-card"
-val VIEW_INPUT_CARD_URL_ID = "input-card-url"
-val VIEW_INPUT_URL_BLOCK_ID = "card-url"
-val VIEW_INPUT_OPTION_CARD_URL_ID = "card-url-option"
-val VIEW_INPUT_OPTION_CARD_SELECTED_URL_ID = "card-url-option-selected"
-val VIEW_INPUT_OPTION_MESSAGE = "Pon aquí la URL y selecciona si quieres que sea una tarjeta roja o una amarilla."
+const val VIEW_HOME_PLACEHOLDER_TIMEPICKER = "Pon la hora."
+const val VIEW_HOME_SECTION_FRIDAY_ID = "time-remaining-section-friday"
+const val VIEW_HOME_SECTION_WEEK_ID = "time-remaining-section-week"
+const val VIEW_HOME_SAVE_BUTTON_ID = "save-time-remaining"
+const val VIEW_HOME_SAVE_CARD_BUTTON_ID = "save-card"
+const val VIEW_INPUT_CARD_URL_ID = "input-card-url"
+const val VIEW_INPUT_URL_BLOCK_ID = "card-url"
+const val VIEW_INPUT_OPTION_CARD_URL_ID = "card-url-option"
+const val VIEW_INPUT_OPTION_CARD_SELECTED_URL_ID = "card-url-option-selected"
+const val VIEW_INPUT_OPTION_MESSAGE = "Pon aquí la URL y selecciona si quieres que sea una tarjeta roja o una amarilla."
+
+const val VIEW_HOME_ACTION_ID_CHANGELOG = "load-changelog-menu"
+const val VIEW_HOME_ACTION_ID_LONELYRUN = "load-lonely-run-menu"
+const val VIEW_HOME_ACTION_ID_LONELYCARD = "load-lonely-card-menu"
+const val VIEW_HOME_ACTION_ID_LONELYME = "load-lonely-me-menu"
+const val VIEW_HOME_SEL_USER_BLOCK_ID = "selected-user-block"
+const val VIEW_HOME_SEL_USER = "selected-user"
 
 /* Yellow Card Modal */
 const val VIEW_MODAL_YELLOW_CARD_TITLE = "¡Tarjeta amarilla!"
@@ -147,3 +154,6 @@ const val UPLOAD_MODAL_ID = "upload_card_confirmation"
 const val UPLOAD_MODAL_TITLE = "¡Tarjeta subida!"
 const val UPLOAD_MODAL_MSG_IMG = "Esta es tu imagen:"
 const val UPLOAD_MODAL_MSG_URL = "Aqui la puedes ver en Imgur: "
+
+/* Text decorators */
+const val INDENTATION = "\t\t"

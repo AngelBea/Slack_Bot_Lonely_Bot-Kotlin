@@ -85,6 +85,7 @@ suspend fun getCurrentUser(slackId: String, slackTeam: String, message: Boolean 
     val slackUserInfo = SlackUserService.getUserById(slackId)
     
     if (slackUserInfo.isBot) throw BadUserException()
+    if (slackUserInfo.id == "USLACKBOT") throw BadUserException()
     
     if(slackUsers.isEmpty()) {
         val channel = SlackChannelService.openConversationByUser(slackId, true)
