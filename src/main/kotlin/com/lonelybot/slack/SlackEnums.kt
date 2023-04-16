@@ -42,7 +42,7 @@ enum class ViewTypes(val typeName: String){
 
 enum class SlackEmoji(val value: String){
     RED_SQUARE(":large_red_square:"),
-    YELLOW_SQUARE(":large_red_square:"),
+    YELLOW_SQUARE(":large_yellow_square:"),
     RUNNER(":runner:"),
     KING(":person_with_crown:"),
     CURLED_PAPER(":page_with_curl:"),
