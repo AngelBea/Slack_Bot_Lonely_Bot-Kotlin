@@ -1,10 +1,10 @@
 package com.lonelybot.services.notion
 
-import com.lonelybot.notion.NotionApp
-import com.lonelybot.notion.builders.NotionPageBuilder
+import com.lonelybot.notion.NotionApi
 import com.lonelybot.notion.decorators.MemeDecorator
 import io.ktor.client.statement.*
 import io.ktor.utils.io.*
+import me.angelbea.application.notion.builders.NotionPageBuilder
 import java.time.LocalDateTime
 
 class MemeService {
@@ -20,7 +20,7 @@ class MemeService {
                 addMultiSelect("Tags", *tags)                
             }
 
-            val response = NotionApp.request.post.insertPage(builder)
+            val response = NotionApi.Pages.insertPage(builder)
             return MemeDecorator.fromJson(response.bodyAsText())
         }
     }

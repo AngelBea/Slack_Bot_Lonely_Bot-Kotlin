@@ -1,7 +1,7 @@
-package com.lonelybot.notion.builders
+package me.angelbea.application.notion.builders
 
-import com.google.gson.Gson
 import com.lonelybot.notion.*
+import me.angelbea.application.notion.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -18,7 +18,7 @@ class NotionPageBuilder(databaseId: String? = null) {
     }
     fun addTitle(field: String, value: String, annotation: NotionAnnotationsObject? = null, href: String? = null){
         val contentText = NotionContentObject(value, null)
-        val notionTextObj = NotionTextObject(contentText, annotation, null, href)
+        val notionTextObj = NotionTextObject(annotation, null, href, contentText)
 
         if (properties.containsKey(field)){
             val existingField = properties[field] as NotionTitle
@@ -31,14 +31,14 @@ class NotionPageBuilder(databaseId: String? = null) {
     
     fun addRichText(field: String, value: String, annotation: NotionAnnotationsObject? = null, href: String? = null){
         val contentText = NotionContentObject(value, null)
-        val notionTextObj = NotionTextObject(contentText, annotation, null, href)
+        val notionTextObj = NotionTextObject(annotation, null, href, contentText)
         
         if (properties.containsKey(field)){
             val existingField = properties[field] as NotionRichText
             existingField.richText.add(notionTextObj)
         }else{
             val textObjectList = mutableListOf<RichTextType>(notionTextObj)
-            properties[field] = NotionRichText(textObjectList)            
+            properties[field] = NotionRichText(textObjectList)
         }
     }
     
@@ -51,12 +51,12 @@ class NotionPageBuilder(databaseId: String? = null) {
             existingField.richText.add(notionExpObj)
         }else{
             val textObjectList = mutableListOf<RichTextType>(notionExpObj)
-            properties[field] = NotionRichText(textObjectList)            
+            properties[field] = NotionRichText(textObjectList)
         }
     }
     
     fun addNumber(field: String, value: Int) {
-        properties[field] = NotionNumber(value)  
+        properties[field] = NotionNumber(value)
     } 
     
     
@@ -92,6 +92,6 @@ class NotionPageBuilder(databaseId: String? = null) {
     
     
     fun toJson(): String{
-        return Gson().toJson(this)
+        return NotionApi.json.toJson(this)
     }
 }

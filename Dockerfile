@@ -1,11 +1,10 @@
-FROM amazoncorretto
+FROM gradle:7.6.3-jdk17 AS build
+COPY --chown=gradle:gradle . /buildgradle
+WORKDIR /buildgradle
+RUN gradle buildFatJar --no-daemon --stacktrace
+
+FROM amazoncorretto:17
+EXPOSE 8080:8080
 RUN mkdir /app
-ENV PORT=8080
-ENV SLACK_BOT_TOKEN=xxx
-ENV SLACK_BOT_TOKEN_TEST=xxx
-ENV SLACK_SIGNING_SECRET =xxx
-ENV NOTION_TOKEN=xxx
-EXPOSE 8080
 COPY ./build/libs/LonelyBotKt-all.jar /app/LonelyBotApp.jar
 ENTRYPOINT ["java", "-jar", "/app/LonelyBotApp.jar"]
-

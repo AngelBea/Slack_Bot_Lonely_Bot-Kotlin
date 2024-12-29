@@ -25,7 +25,8 @@ enum class NotionTypes{
     FILES,
     RELATION,
     FORMULA,
-    EQUATION
+    EQUATION,
+    STATUS
 }
 
 enum class NotionFields{

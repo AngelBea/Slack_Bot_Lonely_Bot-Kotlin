@@ -3,8 +3,7 @@ package com.lonelybot.slack.dispatchers
 import com.google.gson.Gson
 import com.jayway.jsonpath.PathNotFoundException
 import com.lonelybot.*
-import com.lonelybot.notion.NotionApp
-import com.lonelybot.notion.builders.NotionPageBuilder
+import com.lonelybot.notion.NotionApi
 import com.lonelybot.services.global.createRedCard
 import com.lonelybot.services.global.createYellowCard
 import com.lonelybot.services.notion.BadUserException
@@ -20,6 +19,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.launch
+import me.angelbea.application.notion.builders.NotionPageBuilder
 
 fun Route.actionReader(){
     post ("/actions"){        
@@ -68,7 +68,7 @@ suspend fun SlackBlockAction.saveLeavingTime() {
         addRichText("LeavingRestOfWeek", stateWeek)
     }
 
-    NotionApp.request.post.updatePage(currentUser.notionId!!, builder)
+    NotionApi.Pages.updatePage(currentUser.notionId!!, builder)
     SlackApp.request.post.sendTextMessage(currentUser.slackImChannel!!, "Pstt! Solo te informo de que tus horarios se han guardado.")
 }
 

@@ -5,10 +5,11 @@ import com.google.gson.JsonObject
 import com.lonelybot.Permissions
 import com.lonelybot.notion.*
 import com.lonelybot.notion.SlackUser
-import com.lonelybot.notion.builders.NotionFilter
-import com.lonelybot.notion.builders.NotionPageBuilder
 import io.ktor.client.statement.*
 import io.ktor.utils.io.*
+import me.angelbea.application.notion.NotionObjectParser
+import me.angelbea.application.notion.builders.NotionFilter
+import me.angelbea.application.notion.builders.NotionPageBuilder
 
 class NotionSlackUserService{
     companion object: ICompanionService {
@@ -23,11 +24,11 @@ class NotionSlackUserService{
             }
             
             val responseBody =
-                NotionApp.request.post.queryDatabase(filter, databaseId).bodyAsChannel()
+                NotionApi.Databases.queryDatabase(filter, databaseId).bodyAsChannel()
                     .readUTF8Line()
             
-            return NotionObjectParser(SlackUser::class, Gson().fromJson(responseBody!!, JsonObject::class.java))
-                .parseQuery()
+            return NotionObjectParser()
+                .parseQuery(responseBody ?: "")
         }
         
         suspend fun getUsersById(teamId: String, slackIds: Set<String>): List<SlackUser>{
@@ -42,10 +43,10 @@ class NotionSlackUserService{
                 }
             }
             
-            val response = NotionApp.request.post.queryDatabase(filter, databaseId).bodyAsChannel()
+            val response = NotionApi.Databases.queryDatabase(filter, databaseId).bodyAsChannel()
                 .readUTF8Line()
-            return NotionObjectParser(SlackUser::class, Gson().fromJson(response!!, JsonObject::class.java))
-                .parseQuery()
+            return NotionObjectParser()
+                .parseQuery(response ?: "")
         }
         
         suspend fun createUser(slackId: String, slackTeam: String, name: String, imChannel: String){            
@@ -61,11 +62,11 @@ class NotionSlackUserService{
                 addRichText("SlackImChannel", imChannel)
             }
             
-            val response = NotionApp.request.post.insertPage(slackUser)
+            val response = NotionApi.Pages.insertPage(slackUser)
         }
 
         suspend fun updateUser(id: String, builder: NotionPageBuilder){
-            val response = NotionApp.request.post.updatePage(id, builder)
+            val response = NotionApi.Pages.updatePage(id, builder)
         }
     }
 }
