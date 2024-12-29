@@ -14,6 +14,7 @@ import com.lonelybot.services.global.updateCardStatsForUsers
 import com.lonelybot.services.slack.SlackChannelService
 import com.lonelybot.slack.*
 import com.lonelybot.slack.builders.SlackBlockBuilder
+import com.lonelybot.slack.factories.Modules.Companion.MOD_LONELYME
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -230,25 +231,7 @@ suspend fun processLonelyMe(parameters: Params){
     }
     
     val messageBlock = SlackBlockBuilder{
-        addImage("https://i.imgur.com/UyAXgQj.png", "Banner Lonely Me")
-        addImageSection("Te identifico como el esbirro <@${currentUser.slackId}>", currentUser.profileImgFull, currentUser.slackUserName)
-        addDivider()
-        if (!currentUser.isPermitted(Permissions.CARDS)){
-            addTextSection(":large_yellow_square::arrow_forward: Te han castigado con ${currentUser.yellowCardsReceived} amarillas.")
-            addTextSection(":large_yellow_square::arrow_backward: Has castigado con ${currentUser.yellowCardsShown} amarillas")
-            addTextSection(":large_red_square::arrow_forward: Has expulsado a alguien ${currentUser.redCardsShown} veces")
-            addTextSection(":large_red_square::arrow_backward: Te han expulsado ${currentUser.redCardsReceived} veces")            
-        }else{
-            addTextSection(":large_yellow_square::large_red_square:No tengo información de expulsiones/castigos de tarjetas, puede ser porque no tengas permisos.")
-        }
-        
-        if (!currentUser.isPermitted(Permissions.TIMEREMAINING) && currentUser.leavingOnFriday != null && currentUser.leavingRestOfWeek != null){ 
-            addTextSection(":calendar: Empiezas a holgazanear a las ${currentUser.leavingOnFriday} el Viernes")
-            addTextSection(":calendar: Entre semana a las ${currentUser.leavingRestOfWeek}")
-        }else{
-            addTextSection(":calendar: No tengo información de cuando sales, no podrás usar **/lonelyrun** si no me lo dices.")
-        }
-        
+        this append MOD_LONELYME.invoke(currentUser)        
     }
     
     SlackApp.request.post.sendBlockedMessage(parameters.channel_id, messageBlock)    

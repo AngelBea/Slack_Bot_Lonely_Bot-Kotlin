@@ -39,3 +39,26 @@ enum class ViewTypes(val typeName: String){
     MODAL("modal"),
     MESSAGE("message")
 }
+
+enum class SlackEmoji(val value: String){
+    RED_SQUARE(":large_red_square:"),
+    YELLOW_SQUARE(":large_yellow_square:"),
+    RUNNER(":runner:"),
+    KING(":person_with_crown:"),
+    CURLED_PAPER(":page_with_curl:"),
+    MONOCLE(":face_with_monocle:"),
+    BLUE_CIRCLE(":large_blue_circle:"),
+    RED_CIRCLE(":red_circle:"),
+    BLACK_CIRCLE(":black_circle:"),
+    ORANGE_CIRCLE(":large_orange_circle:"),
+    ROBOT(":robot_face:"),
+    ARROW_FORWARD(":arrow_forward:"),
+    ARROW_BACKWARD(":arrow_backward:"),
+    CALENDAR(":calendar:")
+}
+
+enum class SlackStyleButton(val value: String){
+    PRIMARY("primary"),
+    DANGER("danger"),
+    DEFAULT("default")    
+}

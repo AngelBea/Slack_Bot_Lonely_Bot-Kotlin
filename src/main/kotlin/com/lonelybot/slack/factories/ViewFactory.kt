@@ -3,41 +3,76 @@ package com.lonelybot.slack.factories
 import com.lonelybot.*
 import com.lonelybot.adapters.SlackUserAdapter
 import com.lonelybot.notion.decorators.MemeDecorator
-import com.lonelybot.services.global.isPermitted
+import com.lonelybot.slack.SlackEmoji
 import com.lonelybot.slack.builders.SlackViewBuilder
-import java.sql.Time
 
 
 class ViewFactory {
     companion object{
         fun buildHomeForUser(user: SlackUserAdapter): SlackViewBuilder {            
             return SlackViewBuilder{
-                val timePickerUserValueFriday = user.leavingOnFriday
-                val timePickerValueFriday = if (timePickerUserValueFriday != null) Time.valueOf(timePickerUserValueFriday.plus(":00")) else VIEW_HOME_TIME_FRIDAY
-                val timePickerUserValueWeek = user.leavingRestOfWeek
-                val timePickerValueWeek = if (timePickerUserValueWeek != null) Time.valueOf(timePickerUserValueWeek.plus(":00")) else VIEW_HOME_TIME_WEEK
-                
                 home { 
                     toUser(user.slackId)
-                    addImageSection(user.let(VIEW_HOME_MESSAGE_MR_LONELY), VIEW_HOME_IMAGE_MR_LONELY, VIEW_HOME_ALT_MR_LONELY)
+                    this append Modules.MOD_HOME_HEADER.invoke(user)
                     addDivider()
-                    if(user.isPermitted(Permissions.TIMEREMAINING)){
-                        addTimePickerSection(VIEW_HOME_DATEPICKER_FRIDAY, VIEW_HOME_ACTIONID_FRIDAY, VIEW_HOME_PLACEHOLDER_TIMEPICKER,  timePickerValueFriday) byId VIEW_HOME_SECTION_FRIDAY_ID
-                        addTimePickerSection(VIEW_HOME_DATEPICKER_WEEK, VIEW_HOME_ACTIONID_WEEK, VIEW_HOME_PLACEHOLDER_TIMEPICKER,  timePickerValueWeek) byId VIEW_HOME_SECTION_WEEK_ID
-                        addButtonSection( " ", "Guardar", VIEW_HOME_SAVE_BUTTON_ID)
-                    }
-                    if (user.isPermitted(Permissions.CARD_ADMIN)){
-                        addDivider()
-                        addStaticSelectSection(VIEW_INPUT_OPTION_MESSAGE, "tarjeta", VIEW_INPUT_OPTION_CARD_SELECTED_URL_ID, "Roja", "Amarilla") byId VIEW_INPUT_OPTION_CARD_URL_ID
-                        addPlainTextInput(false, VIEW_INPUT_CARD_URL_ID, " ") byId VIEW_INPUT_URL_BLOCK_ID
-                        addButtonSection( " ", "¡Subelo!", VIEW_HOME_SAVE_CARD_BUTTON_ID)
-                    }
+                    this append Modules.MOD_HOME_ACTIONS.invoke(1)
                     addDivider()
-                    addContext { 
-                        addMarkdownText("Puedes seguir el proyecto en <https://github.com/AngelBea/Slack_Bot_Lonely_Bot-Kotlin|Github>")
-                    }
+                    this append Modules.MOD_CHANGELOG_0_01_100
+                    addDivider()
+                    this append Modules.MOD_HOME_FOOTER
                 }
             }   
+        }
+        
+        
+        fun buildLonelyRunMenu(user: SlackUserAdapter): SlackViewBuilder {
+            return SlackViewBuilder {
+                home {
+                    toUser(user.slackId)
+                    this append Modules.MOD_HOME_HEADER.invoke(user)
+                    addDivider()
+                    this append Modules.MOD_HOME_ACTIONS.invoke(2)
+                    addDivider()
+                    this append Modules.MOD_LONELYRUN_SAVE.invoke(user)
+                    addDivider()
+                    this append Modules.MOD_HOME_FOOTER
+                }
+            }
+        }
+
+        fun buildLonelyCardMenu(user: SlackUserAdapter): SlackViewBuilder {
+            return SlackViewBuilder {
+                home {
+                    toUser(user.slackId)
+                    this append Modules.MOD_HOME_HEADER.invoke(user)
+                    addDivider()
+                    this append Modules.MOD_HOME_ACTIONS.invoke(3)
+                    addDivider()
+                    this append Modules.MOD_LONELYCARD_SUGGEST.invoke(user)
+                    addDivider()
+                    this append Modules.MOD_HOME_FOOTER
+                }
+            }
+        }
+        
+        fun buildLonelyMeMenu(user: SlackUserAdapter, withError: Boolean = false, toUser: SlackUserAdapter? = null): SlackViewBuilder {
+            return SlackViewBuilder {
+                home {
+                    toUser(user.slackId)
+                    this append Modules.MOD_HOME_HEADER.invoke(user)
+                    addDivider()
+                    this append Modules.MOD_HOME_ACTIONS.invoke(4)
+                    addDivider()
+                    addUserSelectionSection("Escoge a quien cotillear", "Busca un usuario", VIEW_HOME_SEL_USER) byId VIEW_HOME_SEL_USER_BLOCK_ID
+                    if (withError){
+                        addTextSection("No he encontrado el usuario que me has pedido. ¿No habrás elegido un bot? ${SlackEmoji.MONOCLE.value}")
+                    }else{
+                        this append Modules.MOD_LONELYME.invoke(toUser ?: user)                        
+                    }
+                    addDivider()
+                    this append Modules.MOD_HOME_FOOTER
+                }
+            }
         }
         
         fun buildLoadingModal(externalId: String, triggerId: String): SlackViewBuilder{

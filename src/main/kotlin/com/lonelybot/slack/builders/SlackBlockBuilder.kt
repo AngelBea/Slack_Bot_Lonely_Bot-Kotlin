@@ -27,6 +27,10 @@ class SlackBlockBuilder(builder: SlackBlockBuilder.() -> Unit) {
         return this
     }
     
+    infix fun append(module: SlackModule): SlackBlockBuilder{
+        blocks.addAll(module.blocks)
+        return this
+    }
     fun addMultiTextSection(texts: SlackBlockBuilder.() -> SlackBlockBuilder): SlackBlockBuilder {        
         val textElements = texts().blocks.filterIsInstance<SlackTextSectionBlock>()
             .map { it.text }
@@ -67,7 +71,7 @@ class SlackBlockBuilder(builder: SlackBlockBuilder.() -> Unit) {
     fun addButtonSection(text: String, value: String, actionId: String, isTextMarkdown: Boolean = true): SlackBlockBuilder {
         val textElement = checkMarkdownText(text, isTextMarkdown)
         
-        val button = SlackButton(SlackText(value), value, actionId)
+        val button = SlackButton(SlackText(value), value, actionId, null)
         
         blocks.add(SlackAccessorySection(textElement, button))
         
@@ -216,6 +220,12 @@ class SlackBlockBuilder(builder: SlackBlockBuilder.() -> Unit) {
         blocks.add(input)
         
         return this
+    }
+    
+    fun actions(builder: SlackActionBuilder.() -> Unit){
+        val actionBlock = SlackActionBlock(SlackActionBuilder{}.apply(builder).retrieve())
+        
+        blocks.add(actionBlock)
     }
     
     fun toJson() = Gson().toJson(this)

@@ -13,6 +13,7 @@ import com.lonelybot.services.global.isPermitted
 import com.lonelybot.services.notion.MemeService
 import com.lonelybot.slack.*
 import com.lonelybot.slack.factories.ViewFactory
+import com.lonelybot.slack.managers.HomeViewManager
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -47,6 +48,8 @@ fun Route.actionReader(){
                         when(actionBlock.getActionId()){
                             "save-time-remaining" -> actionBlock.saveLeavingTime()
                             VIEW_HOME_SAVE_CARD_BUTTON_ID -> actionBlock.uploadCard()
+                            VIEW_HOME_SEL_USER -> actionBlock.peakUser()
+                            else -> HomeViewManager(actionBlock).showView()
                         }                        
                     }
                     
@@ -55,6 +58,16 @@ fun Route.actionReader(){
         }
         
         call.respond(HttpStatusCode.OK)
+    }
+}
+suspend fun SlackBlockAction.peakUser(){
+    val userSelected = getStateOf<String>(VIEW_HOME_SEL_USER_BLOCK_ID, VIEW_HOME_SEL_USER, "selected_user")
+    val fromUser = getCurrentUser(this)
+    try {
+        val toUser = getCurrentUser(userSelected, this.team!!.id)
+        ViewFactory.buildLonelyMeMenu(fromUser, false, toUser).deploy()
+    }catch (exception: BadUserException){
+        ViewFactory.buildLonelyMeMenu(fromUser, true).deploy()
     }
 }
 suspend fun SlackBlockAction.saveLeavingTime() {
