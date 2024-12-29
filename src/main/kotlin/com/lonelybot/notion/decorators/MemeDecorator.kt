@@ -3,7 +3,7 @@ package com.lonelybot.notion.decorators
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.lonelybot.notion.Meme
-import com.lonelybot.notion.NotionObjectParser
+import me.angelbea.application.notion.NotionObjectParser
 import java.time.LocalDateTime
 
 class MemeDecorator(meme: Meme) {
@@ -25,7 +25,7 @@ class MemeDecorator(meme: Meme) {
     
     companion object{
         fun fromJson(responseJson: String): MemeDecorator{        
-            val meme = NotionObjectParser(Meme::class)
+            val meme = NotionObjectParser()
                 .parseObject<Meme>(Gson().fromJson(responseJson, JsonObject::class.java))
             
             return MemeDecorator(meme)        

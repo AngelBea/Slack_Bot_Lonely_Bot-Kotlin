@@ -6,7 +6,6 @@ import com.lonelybot.*
 import com.lonelybot.adapters.SlackUserAdapter
 import com.lonelybot.notion.*
 import com.lonelybot.notion.Meme
-import com.lonelybot.notion.builders.NotionFilter
 import com.lonelybot.services.notion.BadUserException
 import com.lonelybot.services.global.getCurrentUser
 import com.lonelybot.services.global.isPermitted
@@ -23,6 +22,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.launch
+import me.angelbea.application.notion.NotionObjectParser
+import me.angelbea.application.notion.builders.NotionFilter
 import java.time.*
 import kotlin.random.Random
 
@@ -103,13 +104,13 @@ suspend fun processCardService(card: Card) {
         }
     }
 
-    val response = NotionApp.request.post.queryDatabase(
+    val response = NotionApi.Databases.queryDatabase(
         notionFilter,
         MEME_TABLE_ID
     ).bodyAsChannel().readUTF8Line()
 
-    val cardMemes = NotionObjectParser(Meme::class, Gson().fromJson(response, JsonObject::class.java))
-        .parseQuery<Meme>()
+    val cardMemes = NotionObjectParser()
+        .parseQuery<Meme>(response ?: "")
         .shuffled(Random(System.currentTimeMillis()))
 
     val builder = SlackBlockBuilder{

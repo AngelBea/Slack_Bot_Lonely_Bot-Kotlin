@@ -2,6 +2,7 @@ package com.lonelybot.notion.builders
 
 import com.lonelybot.notion.NotionFields
 import com.lonelybot.notion.NotionTypes
+import me.angelbea.application.notion.builders.NotionFilter
 
 class NotionFilterBuilder {
     val filters: MutableList<MutableMap<String, Any>> = mutableListOf()

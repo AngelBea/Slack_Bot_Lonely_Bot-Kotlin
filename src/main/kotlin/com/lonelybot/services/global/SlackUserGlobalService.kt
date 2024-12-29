@@ -4,14 +4,15 @@ import com.lonelybot.NotionTags
 import com.lonelybot.Permissions
 import com.lonelybot.YOU_WERE_NOT_REGISTERED
 import com.lonelybot.adapters.SlackUserAdapter
-import com.lonelybot.notion.NotionApp
-import com.lonelybot.notion.builders.NotionPageBuilder
+import com.lonelybot.notion.NotionApi
+
 import com.lonelybot.services.notion.BadUserException
 import com.lonelybot.services.notion.NotionSlackUserService
 import com.lonelybot.services.slack.SlackChannelService
 import com.lonelybot.services.slack.SlackUserService
 import com.lonelybot.singletons.UserSingleton
 import com.lonelybot.slack.*
+import me.angelbea.application.notion.builders.NotionPageBuilder
 
 suspend fun getCurrentUser(parameters: Params, message: Boolean = true): SlackUserAdapter {
     val userId = parameters.user_id
@@ -105,28 +106,28 @@ suspend fun getCurrentUser(slackId: String, slackTeam: String, message: Boolean 
 suspend fun updateCardStatsForUsers(fromUser: SlackUserAdapter, cardName: String, toUser: SlackUserAdapter){
     when(cardName){
         NotionTags.YELLOW_COLOUR.tagName -> {
-            val builderFromUser = NotionPageBuilder.build { 
+            val builderFromUser = NotionPageBuilder.build {
                 addNumber("YellowCardsShown", fromUser.yellowCardsShown.plus(1))
             }
-            NotionApp.request.post.updatePage(fromUser.notionId!!, builderFromUser)
+            NotionApi.Pages.updatePage(fromUser.notionId!!, builderFromUser)
             
             val builderToUser = NotionPageBuilder.build { 
                 addNumber("YellowCardsReceived", toUser.yellowCardsReceived.plus(1))
             }
             
-            NotionApp.request.post.updatePage(toUser.notionId!!, builderToUser)
+            NotionApi.Pages.updatePage(toUser.notionId!!, builderToUser)
         }
         NotionTags.RED_COLOUR.tagName -> {
             val builderFromUser = NotionPageBuilder.build {
                 addNumber("RedCardsShown", fromUser.redCardsShown.plus(1))
             }
-            NotionApp.request.post.updatePage(fromUser.notionId!!, builderFromUser)
+            NotionApi.Pages.updatePage(fromUser.notionId!!, builderFromUser)
 
             val builderToUser = NotionPageBuilder.build {
                 addNumber("RedCardsReceived", toUser.redCardsReceived.plus(1))
             }
 
-            NotionApp.request.post.updatePage(toUser.notionId!!, builderToUser)
+            NotionApi.Pages.updatePage(toUser.notionId!!, builderToUser)
         }
     }
     
