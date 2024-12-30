@@ -77,6 +77,16 @@ class SlackBlockBuilder(builder: SlackBlockBuilder.() -> Unit) {
         
         return this
     }
+
+    fun addButtonLink(text: String, value: String, actionId: String, url: String, isTextMarkdown: Boolean = true): SlackBlockBuilder {
+        val textElement = checkMarkdownText(text, isTextMarkdown)
+
+        val button = SlackButton(SlackText(value), value, actionId, null, url)
+
+        blocks.add(SlackAccessorySection(textElement, button))
+
+        return this
+    }
     
     fun addImageSection(text: String, imageUrl: String, altText: String, isTextMarkdown: Boolean = true): SlackBlockBuilder {
         val textElement = checkMarkdownText(text, isTextMarkdown)

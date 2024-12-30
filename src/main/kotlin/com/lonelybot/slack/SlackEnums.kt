@@ -54,7 +54,11 @@ enum class SlackEmoji(val value: String){
     ROBOT(":robot_face:"),
     ARROW_FORWARD(":arrow_forward:"),
     ARROW_BACKWARD(":arrow_backward:"),
-    CALENDAR(":calendar:")
+    CALENDAR(":calendar:"),
+    DISAPPOINTED(":disappointed:"),
+    SMILE(":smile:"),
+    FILE_CABINET(":file_cabinet:"),
+
 }
 
 enum class SlackStyleButton(val value: String){

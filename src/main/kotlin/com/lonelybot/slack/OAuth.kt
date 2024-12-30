@@ -22,6 +22,7 @@ fun Route.slackOauth(){
             NotionSlackUserService.updateUser(user?.notionId!!, NotionPageBuilder.build {
                 addRichText("UserTokenScope", oauthResponse.authed_user.access_token)
             })
+            UserSingleton.refresh(user.slackId)
             call.respondText("Se ha actualizado con éxito.", status = HttpStatusCode.OK)
         }
     }

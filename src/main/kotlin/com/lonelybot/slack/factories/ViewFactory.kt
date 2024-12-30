@@ -82,6 +82,8 @@ class ViewFactory {
                     this append Modules.MOD_HOME_HEADER.invoke(user)
                     addDivider()
                     this append Modules.MOD_HOME_ACTIONS.invoke(5)
+                    addDivider()
+                    this append Modules.MOD_LONELY_AUTH.invoke(user)
                 }
             }
         }

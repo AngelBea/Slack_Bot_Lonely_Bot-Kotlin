@@ -87,5 +87,16 @@ class Modules {
             addDivider()
             addTextSection("Espero os haya gustado el primer changelog. ¡A romper el bot!")            
         }
+
+        val MOD_LONELY_AUTH = {user: SlackUserAdapter -> SlackModule{
+            addTextSection("Autorizame aquí a manejarte. De todas formas, no es que no lo estuviera haciendo ya ${SlackEmoji.SMILE.value}")
+            addDivider()
+            ("User Token scope: "+user.userTokenScope).let(::println)
+            if ((user.userTokenScope ?: "").isBlank()){
+                addButtonLink("Aun no tienes token, presiona Autorizar para empezar el flujo.\n Nota: Esto te llevara a una ventana del navegador..", "Autorizar", "link_id_auth", URL_OAUTH)
+            }else{
+                addButtonLink("Tengo tu token bien guardadito ${SlackEmoji.FILE_CABINET.value}, puedes hacer un refresh del token si quieres.", "Refresh", "link_id_auth", URL_OAUTH)
+            }
+        }}
     }
 }

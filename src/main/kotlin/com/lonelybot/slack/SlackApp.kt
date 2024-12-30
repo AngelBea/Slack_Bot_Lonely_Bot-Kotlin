@@ -158,7 +158,7 @@ object SlackApp{
                             append("code", code)
                             append("client_id", System.getenv("SLACK_BOT_CLIENT_ID"))
                             append("client_secret", System.getenv("SLACK_BOT_CLIENT_SECRET"))
-                            append("redirect_uri", "https://loudly-romantic-porpoise.ngrok-free.app/oauth")
+                            append("redirect_uri", System.getenv("SLACK_APP_REDIRECT_URI"))
                         }
                     ))
                 }

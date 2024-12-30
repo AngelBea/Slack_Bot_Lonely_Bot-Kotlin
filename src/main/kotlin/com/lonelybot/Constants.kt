@@ -21,6 +21,7 @@ const val KICK_USER_URL = "https://slack.com/api/conversations.kick"
 const val OAUTH_CODE = "https://slack.com/api/oauth.v2.access"
 const val IMGUR_CREATE_IMG_URL = "https://api.imgur.com/3/image"
 const val IMGUR_TOKEN_URL = "https://api.imgur.com/oauth2/token"
+val URL_OAUTH = "https://slack.com/oauth/v2/authorize?client_id=${System.getenv("SLACK_BOT_CLIENT_ID")}&user_scope=chat:write&redirect_uri=${System.getenv("SLACK_APP_REDIRECT_URI")}"
 
 /*
 * Headers

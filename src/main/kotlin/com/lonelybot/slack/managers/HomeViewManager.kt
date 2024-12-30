@@ -1,9 +1,6 @@
 package com.lonelybot.slack.managers
 
-import com.lonelybot.VIEW_HOME_ACTION_ID_CHANGELOG
-import com.lonelybot.VIEW_HOME_ACTION_ID_LONELYCARD
-import com.lonelybot.VIEW_HOME_ACTION_ID_LONELYME
-import com.lonelybot.VIEW_HOME_ACTION_ID_LONELYRUN
+import com.lonelybot.*
 import com.lonelybot.services.global.getCurrentUser
 import com.lonelybot.slack.SlackActionBlock
 import com.lonelybot.slack.SlackBlockAction
@@ -16,6 +13,8 @@ class HomeViewManager(private val action: SlackBlockAction) {
             VIEW_HOME_ACTION_ID_LONELYCARD -> ViewFactory.buildLonelyCardMenu(currentUser)
             VIEW_HOME_ACTION_ID_LONELYRUN -> ViewFactory.buildLonelyRunMenu(currentUser)
             VIEW_HOME_ACTION_ID_LONELYME -> ViewFactory.buildLonelyMeMenu(currentUser)
+            VIEW_HOME_ACTION_ID_AUTH -> ViewFactory.buildOAuthMenu(currentUser)
+            VIEW_HOME_ACTION_ID_CHANGELOG -> ViewFactory.buildHomeForUser(currentUser)
             else -> null
         }
         view?.deploy()
