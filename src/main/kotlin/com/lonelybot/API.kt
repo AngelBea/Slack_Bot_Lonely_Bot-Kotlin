@@ -1,6 +1,11 @@
 package com.lonelybot
 
+import com.google.gson.ExclusionStrategy
+import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
+import com.lonelybot.deserializers.LocalDateTimeTypeAdapter
+import com.lonelybot.deserializers.TextElementDeserializer
+import com.lonelybot.slack.SlackTextElement
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -12,7 +17,19 @@ import io.ktor.utils.io.*
 import java.time.LocalDateTime
 
 open class API {
-    val json = GsonBuilder().setLenient().registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeTypeAdapter()).create()
+    val json = GsonBuilder().setLenient()
+        .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeTypeAdapter())
+        .registerTypeAdapter(SlackTextElement::class.java, TextElementDeserializer())
+        .setExclusionStrategies(object: ExclusionStrategy{
+            override fun shouldSkipField(f: FieldAttributes?): Boolean {
+                return f!!.declaredClass::class.java == ThreadLocal::class.java
+            }
+
+            override fun shouldSkipClass(clazz: Class<*>?): Boolean {
+                return clazz!!::class.java == ThreadLocal::class.java
+            }
+        })
+        .create()
     val client = HttpClient(OkHttp) {
         engine {
             config {
@@ -35,6 +52,7 @@ open class API {
         install(ContentNegotiation) {
             gson{
                 registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeTypeAdapter())
+                registerTypeAdapter(SlackTextElement::class.java, TextElementDeserializer())
             }
         }
     }

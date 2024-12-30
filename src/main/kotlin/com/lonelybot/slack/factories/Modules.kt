@@ -16,6 +16,7 @@ class Modules {
                     button("Lonely Run", VIEW_HOME_ACTION_ID_LONELYRUN, SlackEmoji.RUNNER, if (primaryPosition == 2) SlackStyleButton.PRIMARY else null)
                     button("Lonely Card", VIEW_HOME_ACTION_ID_LONELYCARD, SlackEmoji.RED_SQUARE, if (primaryPosition == 3) SlackStyleButton.PRIMARY else null)
                     button("Lonely Me", VIEW_HOME_ACTION_ID_LONELYME, SlackEmoji.MONOCLE, if (primaryPosition == 4) SlackStyleButton.PRIMARY else null)
+                    button("Autorizar", VIEW_HOME_ACTION_ID_AUTH, SlackEmoji.ROBOT, if (primaryPosition == 5) SlackStyleButton.PRIMARY else null)
                 }
             }
         }     

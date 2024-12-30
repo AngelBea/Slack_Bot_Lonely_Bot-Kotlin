@@ -11,6 +11,7 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.*
+import io.netty.handler.codec.http.HttpHeaderValues
 
 
 object SlackApp{
@@ -59,10 +60,11 @@ object SlackApp{
                 }
             }
 
-            suspend fun sendBlockedMessage(channel: String, builder: SlackBlockBuilder): HttpResponse {
+            suspend fun sendBlockedMessage(channel: String, builder: SlackBlockBuilder, userToken: String? = null): HttpResponse {
                 return client.request{
+                    val TOKEN = userToken ?: BOT_TOKEN
                     headers {
-                        append(HEADER_AUTH_NAME, "Bearer $BOT_TOKEN")
+                        append(HEADER_AUTH_NAME, "Bearer $TOKEN")
                         append(HEADER_CONTENT_TYPE_NAME, "application/json")
                     }
 
@@ -141,6 +143,24 @@ object SlackApp{
                     method = HttpMethod.Post
                     val map = mapOf("channel" to channel, "user" to userId)                    
                     setBody(Gson().toJson(map))
+                }
+            }
+            suspend fun getOauthUserCode(code: String): HttpResponse{
+                return client.request{
+                    headers {
+                        append(HttpHeaders.ContentType, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+                    }
+
+                    url(OAUTH_CODE)
+                    method = HttpMethod.Post
+                    setBody(FormDataContent(
+                        Parameters.build {
+                            append("code", code)
+                            append("client_id", System.getenv("SLACK_BOT_CLIENT_ID"))
+                            append("client_secret", System.getenv("SLACK_BOT_CLIENT_SECRET"))
+                            append("redirect_uri", "https://loudly-romantic-porpoise.ngrok-free.app/oauth")
+                        }
+                    ))
                 }
             }
         }

@@ -18,6 +18,7 @@ const val BOT_INFO_URL = "https://slack.com/api/bots.info"
 const val OPEN_MODAL_URL = "https://slack.com/api/views.open"
 const val UPDATE_VIEW_URL = "https://slack.com/api/views.update"
 const val KICK_USER_URL = "https://slack.com/api/conversations.kick"
+const val OAUTH_CODE = "https://slack.com/api/oauth.v2.access"
 const val IMGUR_CREATE_IMG_URL = "https://api.imgur.com/3/image"
 const val IMGUR_TOKEN_URL = "https://api.imgur.com/oauth2/token"
 
@@ -36,7 +37,6 @@ val TEST_MODE: Boolean = System.getenv("TEST_MODE").toBoolean()
 val BOT_TOKEN_PROD: String = System.getenv("SLACK_BOT_TOKEN")
 val BOT_TOKEN_TEST: String = System.getenv("SLACK_BOT_TOKEN_TEST")
 val BOT_TOKEN: String = if (TEST_MODE) BOT_TOKEN_TEST else BOT_TOKEN_PROD
-val NOTION_TOKEN: String = System.getenv("NOTION_TOKEN")
 val IMGUR_REFRESH_TOKEN: String = System.getenv("IMGUR_REFRESH_TOKEN")
 val IMGUR_CLIENT_ID: String = System.getenv("IMGUR_ID")
 val IMGUR_CLIENT_SECRET: String = System.getenv("IMGUR_SECRET")
@@ -114,6 +114,7 @@ const val VIEW_HOME_ACTION_ID_CHANGELOG = "load-changelog-menu"
 const val VIEW_HOME_ACTION_ID_LONELYRUN = "load-lonely-run-menu"
 const val VIEW_HOME_ACTION_ID_LONELYCARD = "load-lonely-card-menu"
 const val VIEW_HOME_ACTION_ID_LONELYME = "load-lonely-me-menu"
+const val VIEW_HOME_ACTION_ID_AUTH = "load-auth"
 const val VIEW_HOME_SEL_USER_BLOCK_ID = "selected-user-block"
 const val VIEW_HOME_SEL_USER = "selected-user"
 
@@ -154,6 +155,15 @@ const val UPLOAD_MODAL_ID = "upload_card_confirmation"
 const val UPLOAD_MODAL_TITLE = "¡Tarjeta subida!"
 const val UPLOAD_MODAL_MSG_IMG = "Esta es tu imagen:"
 const val UPLOAD_MODAL_MSG_URL = "Aqui la puedes ver en Imgur: "
+
+/* Response Modal */
+const val RESPONSE_MODAL_ID = "response_modal"
+const val RESPONSE_MODAL_TITLE = "Responde al mensaje."
+const val RESPONSE_MODAL_INPUT_MESSAGE_ID = "response_modal_message"
+const val RESPONSE_MODAL_INPUT_MESSAGE_ID_ACTION = "response_modal_message_action"
+const val RESPONSE_MODAL_CHANNEL_ID = "change_channel_response"
+const val RESPONSE_MODAL_CHANNEL_ID_ACTION = "change_channel_response_action"
+const val RESPONSE_MODAL_MESSAGE_SECTION = "message_to_response"
 
 /* Text decorators */
 const val INDENTATION = "\t\t"

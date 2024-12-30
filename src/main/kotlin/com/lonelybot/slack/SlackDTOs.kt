@@ -9,7 +9,7 @@ data class Params(val token: String, val team_id: String, val team_domain: Strin
                   val api_app_id: String, val is_enterprise_install: String, val response_url: String, val trigger_id: String)
 data class Message(val channel: String, val text: String, val user: String? = null, 
                    @SerializedName("bot_id") val botId: String? = null, val username: String = "Señor Feudal Mister Lonely", 
-                   val blocks: MutableList<SlackBlock> = mutableListOf())
+                   val blocks: MutableList<SlackBlock> = mutableListOf(), val subtype: String? = null)
 
 open class SlackBlock(val type: String, var block_id: String?)
 data class SlackActionBlock(val elements: List<Element>): SlackBlock(BlockType.ACTIONS.typeName, null)
@@ -54,7 +54,7 @@ open class SlackAction(val type: String?, val team: Team?, val user: User?, val 
 data class SlackMessageAction(val message: Message): SlackAction(null, null, null, null, null, null, null)
 data class SlackValues(val values: JsonObject)
 
-data class Team(val id: String, val domain: String)
+data class Team(val id: String, val domain: String? = null, val name: String? = null)
 
 data class User(val id: String, val username: String, @SerializedName("team_id") val teamId: String, val name: String)
 

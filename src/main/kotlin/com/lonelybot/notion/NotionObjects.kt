@@ -1,5 +1,6 @@
 package com.lonelybot.notion
 
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import kotlinx.html.P
 import kotlinx.html.unsafe
@@ -89,12 +90,20 @@ data class NotionStringFormulaObject(val string: String)
 
 data class NotionStatusObject(val id: String, val name: String, val color: String)
 
-open class RichTextType(val type: String, val annotations: NotionAnnotationsObject?, val href: String?, @SerializedName("plain_text") val plainText: String?, open val text: NotionContentObject? = null)
+open class RichTextType(val type: String, open val annotations: NotionAnnotationsObject?,
+                        open val href: String?, @SerializedName("plain_text") open val plainText: String?,
+                        open val text: NotionContentObject? = null)
 
-data class NotionTextObject(private val textAnnotations: NotionAnnotationsObject? = null, private val textHref: String? = null, private val textValue: String?, private val contentObject: NotionContentObject?)
-    : RichTextType(NotionTypes.TEXT.name.lowercase(), textAnnotations, textHref, textValue, contentObject)
+data class NotionTextObject(@Transient private val annotationsValue: NotionAnnotationsObject?,
+                            @Transient private val hrefValue: String?,
+                            @Transient private val plainTextValue: String?,
+                            @Transient private val textValue: NotionContentObject? = null)
+    : RichTextType(NotionTypes.TEXT.name.lowercase(), annotationsValue, hrefValue, plainTextValue, textValue)
 
-data class NotionEquationObject(val equation: NotionExpressionObject, private val expAnnotations: NotionAnnotationsObject? = null, private val expHref: String? = null, private val expValue: String?)
+data class NotionEquationObject(val equation: NotionExpressionObject,
+                                @Transient private val expAnnotations: NotionAnnotationsObject? = null,
+                                @Transient private val expHref: String? = null,
+                                @Transient private val expValue: String?)
     : RichTextType(NotionTypes.EQUATION.name.lowercase(), expAnnotations, expHref, expValue)
 
 data class MultiSelectObject(val name: String)

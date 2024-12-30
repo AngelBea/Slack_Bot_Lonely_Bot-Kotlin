@@ -58,6 +58,10 @@ class SlackUserAdapter(private val notionSlackUser: SlackUser, private val userI
     val notionId by lazy{
         notionSlackUser.id
     }
-    
+
+    val userTokenScope by lazy{
+        notionSlackUser.userTokenScope?.value
+    }
+
     fun divide() = notionSlackUser to userInfo
 }

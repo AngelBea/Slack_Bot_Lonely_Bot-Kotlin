@@ -9,8 +9,11 @@ import com.lonelybot.services.global.createYellowCard
 import com.lonelybot.services.notion.BadUserException
 import com.lonelybot.services.global.getCurrentUser
 import com.lonelybot.services.global.isPermitted
-import com.lonelybot.services.notion.MemeService
+import com.lonelybot.services.slack.SlackBotService
+import com.lonelybot.services.slack.SlackChannelService
+import com.lonelybot.singletons.UserSingleton
 import com.lonelybot.slack.*
+import com.lonelybot.slack.builders.SlackBlockBuilder
 import com.lonelybot.slack.factories.ViewFactory
 import com.lonelybot.slack.managers.HomeViewManager
 import io.ktor.http.*
@@ -30,10 +33,11 @@ fun Route.actionReader(){
         val action = Gson().fromJson(parameters.toString(), SlackAction::class.java)
         
         launch {
-            action.callbackId.let(::println)
+            "Action Callback -> "+action.callbackId.let(::println)
             when(action.callbackId){
                 "yellow_card" -> getActionAs<SlackMessageAction>(parameters).yellowCard()
                 "red_card" -> getActionAs<SlackMessageAction>(parameters).redCard()
+                "response" -> getActionAs<SlackMessageAction>(parameters).response()
                 null -> {
                     if (action.type == "view_submission"){
                         val viewSubmission = getActionAs<SlackViewSubmission>(parameters)
@@ -41,6 +45,7 @@ fun Route.actionReader(){
                         when(viewSubmission.getExternalId()){
                             VIEW_MODAL_YELLOW_CARD_ID -> viewSubmission.yellowCard()
                             VIEW_MODAL_RED_CARD_ID -> viewSubmission.redCard()
+                            RESPONSE_MODAL_ID -> viewSubmission.response()
                         }
                     }else{
                         val actionBlock = getActionAs<SlackBlockAction>(parameters)
@@ -82,6 +87,7 @@ suspend fun SlackBlockAction.saveLeavingTime() {
     }
 
     NotionApi.Pages.updatePage(currentUser.notionId!!, builder)
+    UserSingleton.refresh(currentUser.slackId)
     SlackApp.request.post.sendTextMessage(currentUser.slackImChannel!!, "Pstt! Solo te informo de que tus horarios se han guardado.")
 }
 
@@ -142,6 +148,17 @@ suspend fun SlackMessageAction.redCard(){
     ViewFactory.buildModalRedCard(fromUser, toUserAd, triggerId!!, channel!!.id).update(VIEW_MODAL_RED_CARD_ID)
 }
 
+suspend fun SlackMessageAction.response(){
+    ViewFactory.buildLoadingModal(RESPONSE_MODAL_ID, triggerId!!).deploy()
+    var fromUser: String
+    if (message.subtype == "bot_message"){
+        fromUser = SlackBotService.getBotById(message.botId!!).userId
+    }else{
+        fromUser = message.user!!
+    }
+    ViewFactory.buildModalResponse(triggerId, message.text, fromUser, channel!!.id).update(RESPONSE_MODAL_ID)
+}
+
 suspend fun SlackViewSubmission.redCard(){
     val toUser = getStateOf<String>(VIEW_MODAL_RED_CARD_USER_BLOCK_ID, VIEW_MODAL_RED_USER_CARD_ACTION_ID, "selected_user")
     val reason = getStateOf<String>(VIEW_MODAL_RED_CARD_TEXT_BLOCK_ID, VIEW_MODAL_RED_CARD_TEXT_ACTION_ID, "value")
@@ -183,6 +200,16 @@ suspend fun SlackBlockAction.uploadCard(){
     ViewFactory.buildModalUploadConfirmation(triggerId, meme).update(UPLOAD_MODAL_ID)
 }
 
+suspend fun SlackViewSubmission.response(){
+    val channel = getStateOf<String>(RESPONSE_MODAL_CHANNEL_ID, RESPONSE_MODAL_CHANNEL_ID_ACTION, "selected_conversation")
+    val message = getStateOf<String>(RESPONSE_MODAL_INPUT_MESSAGE_ID, RESPONSE_MODAL_INPUT_MESSAGE_ID_ACTION, "value")
+    val currentUser = getCurrentUser(this)
+    val block = getBlockIdAs<SlackTextSectionBlock>(RESPONSE_MODAL_MESSAGE_SECTION).text as SlackMarkdown
+    SlackApp.request.post.sendBlockedMessage(channel, SlackBlockBuilder {
+        addTextSection(block.text, isTextMarkdown = true)
+        addTextSection(message, isTextMarkdown = true)
+    }, currentUser.userTokenScope)
+}
 inline fun <reified T> getActionAs(json: String?) : T{
     return Gson().fromJson(json, T::class.java)
 }

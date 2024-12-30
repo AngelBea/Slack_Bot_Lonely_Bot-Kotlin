@@ -1,7 +1,5 @@
 package com.lonelybot.slack.dispatchers
 
-import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.lonelybot.*
 import com.lonelybot.adapters.SlackUserAdapter
 import com.lonelybot.notion.*

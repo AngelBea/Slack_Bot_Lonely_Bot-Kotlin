@@ -12,12 +12,13 @@ import com.lonelybot.slack.factories.ViewFactory
 class HomeViewManager(private val action: SlackBlockAction) {    
     suspend fun showView(){
         val currentUser = getCurrentUser(action)
-        when(action.getActionId()){            
+        val view = when(action.getActionId()){
             VIEW_HOME_ACTION_ID_LONELYCARD -> ViewFactory.buildLonelyCardMenu(currentUser)
             VIEW_HOME_ACTION_ID_LONELYRUN -> ViewFactory.buildLonelyRunMenu(currentUser)
             VIEW_HOME_ACTION_ID_LONELYME -> ViewFactory.buildLonelyMeMenu(currentUser)
-            else -> ViewFactory.buildHomeForUser(currentUser)
-        }.deploy()
+            else -> null
+        }
+        view?.deploy()
     }
     
 }

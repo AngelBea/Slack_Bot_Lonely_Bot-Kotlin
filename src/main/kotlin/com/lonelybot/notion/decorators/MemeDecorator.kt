@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.lonelybot.notion.Meme
 import me.angelbea.application.notion.NotionObjectParser
-import java.time.LocalDateTime
 
 class MemeDecorator(meme: Meme) {
     val name by lazy { 

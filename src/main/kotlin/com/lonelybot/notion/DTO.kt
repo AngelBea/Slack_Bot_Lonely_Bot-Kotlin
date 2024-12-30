@@ -16,4 +16,5 @@ data class SlackUser(@NotionField("SlackId") val slackId: NotionRichText,
                      @NotionField("Permissions") val permissions: NotionMultiSelect, 
                      @NotionField("LeavingOnFriday") val leavingOnFriday: NotionRichText?, 
                      @NotionField("LeavingRestOfWeek") val leavingRestOfWeek: NotionRichText,
-                     @NotionField("SlackImChannel") val slackImChannel: NotionRichText): NotionPage()
+                     @NotionField("SlackImChannel") val slackImChannel: NotionRichText,
+                     @NotionField("UserTokenScope") val userTokenScope:NotionRichText?): NotionPage()

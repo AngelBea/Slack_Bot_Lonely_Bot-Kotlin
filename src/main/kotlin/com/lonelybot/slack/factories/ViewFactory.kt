@@ -74,7 +74,18 @@ class ViewFactory {
                 }
             }
         }
-        
+
+        fun buildOAuthMenu(user: SlackUserAdapter, withError: Boolean = false, toUser: SlackUserAdapter? = null): SlackViewBuilder {
+            return SlackViewBuilder {
+                home {
+                    toUser(user.slackId)
+                    this append Modules.MOD_HOME_HEADER.invoke(user)
+                    addDivider()
+                    this append Modules.MOD_HOME_ACTIONS.invoke(5)
+                }
+            }
+        }
+
         fun buildLoadingModal(externalId: String, triggerId: String): SlackViewBuilder{
             return SlackViewBuilder{
                 modal(triggerId){
@@ -155,6 +166,23 @@ class ViewFactory {
                 } 
             } byId UPLOAD_MODAL_ID
         }
-        
+
+        fun buildModalResponse(triggerId: String, message:String, fromUser: String, channelId: String): SlackViewBuilder{
+            return SlackViewBuilder{
+                modal(triggerId){
+                    title(RESPONSE_MODAL_TITLE)
+                    blocks {
+                        addConversationSelectionSection(
+                            "<@${fromUser}> escribió en <#$channelId> enviar respuesta a:", "Channel", RESPONSE_MODAL_CHANNEL_ID_ACTION, channelId, true
+                        ) byId RESPONSE_MODAL_CHANNEL_ID
+                        addTextSection("> :bust_in_silhouette: <@${fromUser}>\n>$message", true) byId RESPONSE_MODAL_MESSAGE_SECTION
+                        addDivider()
+                        addPlainTextInput(true, RESPONSE_MODAL_INPUT_MESSAGE_ID_ACTION, "Escribe tu mensaje: ") byId RESPONSE_MODAL_INPUT_MESSAGE_ID
+                        close("Cerrar")
+                        submit("¡Responder!")
+                    }
+                }
+            } byId RESPONSE_MODAL_ID
+        }
     }
 }
